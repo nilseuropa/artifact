@@ -1,8 +1,10 @@
 package com.nils.artifact.ui
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.nils.artifact.data.ArtifactBackupArchive
 import com.nils.artifact.data.ArtifactDatabase
 import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactRepository
@@ -107,6 +109,75 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
         _collectionSettings.value = settings
         viewModelScope.launch(Dispatchers.IO) {
             settingsStore.save(settings)
+        }
+    }
+
+    fun exportBackup(uri: Uri, onComplete: (Result<String>) -> Unit) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    val snapshot = repository.backupSnapshot()
+                    val resolver = getApplication<Application>().contentResolver
+                    resolver.openOutputStream(uri)?.use { output ->
+                        ArtifactBackupArchive.write(
+                            outputStream = output,
+                            snapshot = snapshot,
+                            settings = _collectionSettings.value,
+                        )
+                    } ?: error("Could not open backup destination.")
+                    "Exported ${snapshot.items.size} items and ${snapshot.photos.size} photos."
+                }
+            }
+            onComplete(result)
+        }
+    }
+
+    fun restoreBackup(uri: Uri, onComplete: (Result<String>) -> Unit) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    val context = getApplication<Application>()
+                    val resolver = context.contentResolver
+                    val archive = resolver.openInputStream(uri)?.use { input ->
+                        ArtifactBackupArchive.read(context, input)
+                    } ?: error("Could not open backup file.")
+
+                    val restoredPhotoDirectory = ArtifactBackupArchive.restoredPhotoDirectory(context)
+                    val restoredPhotoFiles = mutableListOf<File>()
+                    try {
+                        val restoredPhotos = archive.photos.map { restorePhoto ->
+                            val targetFile = File(
+                                restoredPhotoDirectory,
+                                "${restorePhoto.photo.id}${restorePhoto.extension}",
+                            )
+                            restorePhoto.temporaryFile.copyTo(targetFile, overwrite = true)
+                            restoredPhotoFiles += targetFile
+                            restorePhoto.photo.copy(filePath = targetFile.absolutePath)
+                        }
+
+                        val previousPhotoPaths = repository.replaceAllFromBackup(
+                            items = archive.items,
+                            photos = restoredPhotos,
+                            uidAllocations = archive.uidAllocations,
+                        )
+                        settingsStore.save(archive.settings)
+                        _collectionSettings.value = archive.settings
+
+                        previousPhotoPaths.forEach { path ->
+                            runCatching { File(path).delete() }
+                        }
+                        archive.temporaryDirectory.deleteRecursively()
+
+                        "Restored ${archive.items.size} items and ${restoredPhotos.size} photos."
+                    } catch (error: Throwable) {
+                        restoredPhotoFiles.forEach { file -> runCatching { file.delete() } }
+                        runCatching { restoredPhotoDirectory.deleteRecursively() }
+                        archive.temporaryDirectory.deleteRecursively()
+                        throw error
+                    }
+                }
+            }
+            onComplete(result)
         }
     }
 }

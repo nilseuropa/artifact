@@ -32,7 +32,13 @@ interface ArtifactDao {
     suspend fun insertItem(item: ArtifactItem)
 
     @Insert
+    suspend fun insertItems(items: List<ArtifactItem>)
+
+    @Insert
     suspend fun insertUidAllocation(allocation: CatalogUidAllocation)
+
+    @Insert
+    suspend fun insertUidAllocations(allocations: List<CatalogUidAllocation>)
 
     @Insert
     suspend fun insertPhotos(photos: List<ArtifactPhoto>)
@@ -45,6 +51,24 @@ interface ArtifactDao {
 
     @Delete
     suspend fun deleteItem(item: ArtifactItem)
+
+    @Query("SELECT * FROM items ORDER BY createdAt ASC, id ASC")
+    suspend fun getAllItems(): List<ArtifactItem>
+
+    @Query("SELECT * FROM photos ORDER BY createdAt ASC, id ASC")
+    suspend fun getAllPhotos(): List<ArtifactPhoto>
+
+    @Query("SELECT * FROM catalog_uid_allocations ORDER BY uid ASC")
+    suspend fun getAllUidAllocations(): List<CatalogUidAllocation>
+
+    @Query("DELETE FROM photos")
+    suspend fun clearPhotos()
+
+    @Query("DELETE FROM items")
+    suspend fun clearItems()
+
+    @Query("DELETE FROM catalog_uid_allocations")
+    suspend fun clearUidAllocations()
 
     @Transaction
     suspend fun insertItemWithPhotos(item: ArtifactItem, photos: List<ArtifactPhoto>): ArtifactItem {
@@ -60,5 +84,19 @@ interface ArtifactDao {
         insertItem(itemWithUid)
         insertPhotos(photos)
         return itemWithUid
+    }
+
+    @Transaction
+    suspend fun replaceAllForRestore(
+        items: List<ArtifactItem>,
+        photos: List<ArtifactPhoto>,
+        uidAllocations: List<CatalogUidAllocation>,
+    ) {
+        clearPhotos()
+        clearItems()
+        clearUidAllocations()
+        insertUidAllocations(uidAllocations)
+        insertItems(items)
+        insertPhotos(photos)
     }
 }

@@ -57,4 +57,31 @@ class ArtifactRepository(private val dao: ArtifactDao) {
     suspend fun updateItem(item: ArtifactItem) {
         dao.updateItem(item.copy(updatedAt = System.currentTimeMillis()))
     }
+
+    suspend fun backupSnapshot(): ArtifactBackupSnapshot =
+        ArtifactBackupSnapshot(
+            items = dao.getAllItems(),
+            photos = dao.getAllPhotos(),
+            uidAllocations = dao.getAllUidAllocations(),
+        )
+
+    suspend fun replaceAllFromBackup(
+        items: List<ArtifactItem>,
+        photos: List<ArtifactPhoto>,
+        uidAllocations: List<CatalogUidAllocation>,
+    ): List<String> {
+        val previousPhotoPaths = dao.getAllPhotos().map { photo -> photo.filePath }
+        dao.replaceAllForRestore(
+            items = items,
+            photos = photos,
+            uidAllocations = uidAllocations,
+        )
+        return previousPhotoPaths
+    }
 }
+
+data class ArtifactBackupSnapshot(
+    val items: List<ArtifactItem>,
+    val photos: List<ArtifactPhoto>,
+    val uidAllocations: List<CatalogUidAllocation>,
+)

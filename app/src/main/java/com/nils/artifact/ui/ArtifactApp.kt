@@ -3,6 +3,7 @@ package com.nils.artifact.ui
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import androidx.activity.compose.BackHandler
@@ -52,6 +53,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -108,6 +111,7 @@ import com.google.zxing.DecodeHintType
 import com.google.zxing.MultiFormatReader
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
+import com.nils.artifact.data.ArtifactBackupArchive
 import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
@@ -120,7 +124,9 @@ import com.nils.artifact.label.NiimbotPrinter
 import org.json.JSONObject
 import java.io.File
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.concurrent.Executors
 import kotlinx.coroutines.launch
 
@@ -267,6 +273,8 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                 Screen.Settings -> CollectionSettingsScreen(
                     settings = collectionSettings,
                     onSave = viewModel::saveCollectionSettings,
+                    onExportBackup = viewModel::exportBackup,
+                    onRestoreBackup = viewModel::restoreBackup,
                 )
             }
 
@@ -596,6 +604,8 @@ private fun StatBlock(label: String, value: String, modifier: Modifier = Modifie
 private fun CollectionSettingsScreen(
     settings: CollectionSettings,
     onSave: (CollectionSettings) -> Unit,
+    onExportBackup: (Uri, (Result<String>) -> Unit) -> Unit,
+    onRestoreBackup: (Uri, (Result<String>) -> Unit) -> Unit,
 ) {
     var collectionName by rememberSaveable(settings.collectionName) {
         mutableStateOf(settings.collectionName)
@@ -613,6 +623,36 @@ private fun CollectionSettingsScreen(
         mutableStateOf(settings.ownerNotes)
     }
     var savedMessageVisible by remember { mutableStateOf(false) }
+    var backupMessage by remember { mutableStateOf<String?>(null) }
+    var backupInProgress by remember { mutableStateOf(false) }
+    var restoreUri by remember { mutableStateOf<Uri?>(null) }
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/zip"),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        backupInProgress = true
+        backupMessage = "Exporting backup..."
+        onExportBackup(uri) { result ->
+            backupInProgress = false
+            backupMessage = result.fold(
+                onSuccess = { message -> message },
+                onFailure = { error -> error.message ?: "Backup export failed." },
+            )
+        }
+    }
+    val restoreLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        restoreUri = uri
+    }
+    fun currentSettings(): CollectionSettings =
+        CollectionSettings(
+            collectionName = collectionName,
+            ownerName = ownerName,
+            ownerEmail = ownerEmail,
+            ownerPhone = ownerPhone,
+            ownerNotes = ownerNotes,
+        )
 
     Column(
         modifier = Modifier
@@ -675,15 +715,7 @@ private fun CollectionSettingsScreen(
         )
         Button(
             onClick = {
-                onSave(
-                    CollectionSettings(
-                        collectionName = collectionName,
-                        ownerName = ownerName,
-                        ownerEmail = ownerEmail,
-                        ownerPhone = ownerPhone,
-                        ownerNotes = ownerNotes,
-                    ),
-                )
+                onSave(currentSettings())
                 savedMessageVisible = true
             },
             shape = RoundedCornerShape(8.dp),
@@ -700,6 +732,86 @@ private fun CollectionSettingsScreen(
                 color = MaterialTheme.colorScheme.secondary,
             )
         }
+        OutlinedButton(
+            onClick = {
+                onSave(currentSettings())
+                savedMessageVisible = false
+                exportLauncher.launch(defaultBackupFileName())
+            },
+            enabled = !backupInProgress,
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.FileUpload, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Export Backup")
+        }
+        OutlinedButton(
+            onClick = {
+                restoreLauncher.launch(
+                    arrayOf(
+                        "application/zip",
+                        "application/octet-stream",
+                        "*/*",
+                    ),
+                )
+            },
+            enabled = !backupInProgress,
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.FileDownload, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Restore Backup")
+        }
+        backupMessage?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (message.contains("failed", ignoreCase = true) ||
+                    message.contains("missing", ignoreCase = true) ||
+                    message.contains("invalid", ignoreCase = true) ||
+                    message.contains("unsupported", ignoreCase = true)
+                ) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            )
+        }
+    }
+
+    restoreUri?.let { uri ->
+        AlertDialog(
+            onDismissRequest = { restoreUri = null },
+            title = { Text("Restore Backup") },
+            text = {
+                Text("Restoring a backup will replace the current local collection, photos, settings, and UID history.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        restoreUri = null
+                        backupInProgress = true
+                        backupMessage = "Restoring backup..."
+                        onRestoreBackup(uri) { result ->
+                            backupInProgress = false
+                            backupMessage = result.fold(
+                                onSuccess = { message -> message },
+                                onFailure = { error -> error.message ?: "Backup restore failed." },
+                            )
+                        }
+                    },
+                ) {
+                    Text("Restore")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { restoreUri = null }) {
+                    Text("Cancel")
+                }
+            },
+        )
     }
 }
 
@@ -2280,6 +2392,11 @@ private fun formatTimestamp(timestamp: Long): String =
         DateFormat.SHORT,
         DateFormat.SHORT,
     ).format(Date(timestamp))
+
+private fun defaultBackupFileName(): String {
+    val timestamp = SimpleDateFormat("yyyy-MM-dd-HHmm", Locale.US).format(Date())
+    return "artifact-backup-$timestamp.${ArtifactBackupArchive.FILE_EXTENSION}"
+}
 
 private fun productionYearsLabel(start: Int?, end: Int?): String? =
     when {
