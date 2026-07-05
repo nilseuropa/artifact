@@ -544,10 +544,22 @@ private fun CollectionSummaryScreen(items: List<ArtifactWithPhotos>) {
     val valuedItems = items.filter { artifact -> artifact.item.estimatedValue != null }
     val totalValue = valuedItems.sumOf { artifact -> artifact.item.estimatedValue ?: 0.0 }
     val unvaluedCount = items.size - valuedItems.size
+    val categorySortOrder = ArtifactCategories.ALL.withIndex()
+        .associate { (index, category) -> category to index }
+    val categoryCounts = items
+        .groupingBy { artifact -> ArtifactCategories.normalize(artifact.item.category) }
+        .eachCount()
+        .toList()
+        .sortedWith(
+            compareBy<Pair<String, Int>> { (category, _) ->
+                categorySortOrder[category] ?: Int.MAX_VALUE
+            }.thenBy { (category, _) -> category },
+        )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -576,6 +588,52 @@ private fun CollectionSummaryScreen(items: List<ArtifactWithPhotos>) {
                 text = "$unvaluedCount device${if (unvaluedCount == 1) "" else "s"} without estimated value",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (categoryCounts.isNotEmpty()) {
+            Text(
+                text = "Items per category",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                categoryCounts.forEach { (category, count) ->
+                    CategoryCountRow(
+                        category = category,
+                        count = count,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoryCountRow(category: String, count: Int) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = category,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
             )
         }
     }
