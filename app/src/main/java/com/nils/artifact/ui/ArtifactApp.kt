@@ -683,6 +683,7 @@ private fun DetailScreen(
     var selectedPhotoPath by rememberSaveable(item.id) {
         mutableStateOf(artifact.photos.firstOrNull()?.filePath)
     }
+    var fullscreenPhotoPath by rememberSaveable(item.id) { mutableStateOf<String?>(null) }
     var editTextTarget by remember { mutableStateOf<EditTextTarget?>(null) }
     var editYearsTarget by remember { mutableStateOf<EditYearsTarget?>(null) }
     val photoPaths = artifact.photos.map { photo -> photo.filePath }
@@ -710,6 +711,7 @@ private fun DetailScreen(
             photoPaths = photoPaths,
             selectedPhotoPath = selectedPhotoPath,
             onSelectPhoto = { path -> selectedPhotoPath = path },
+            onOpenFullScreen = { path -> fullscreenPhotoPath = path },
         )
 
         DetailReadOnlyRow(label = "UID", value = "#${item.catalogUid}")
@@ -833,6 +835,13 @@ private fun DetailScreen(
             onDismiss = { editYearsTarget = null },
         )
     }
+
+    fullscreenPhotoPath?.let { path ->
+        FullScreenPhotoViewer(
+            photoPath = path,
+            onDismiss = { fullscreenPhotoPath = null },
+        )
+    }
 }
 
 @Composable
@@ -840,6 +849,7 @@ private fun PhotoGallery(
     photoPaths: List<String>,
     selectedPhotoPath: String?,
     onSelectPhoto: (String) -> Unit,
+    onOpenFullScreen: (String) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
@@ -871,7 +881,8 @@ private fun PhotoGallery(
             color = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(4f / 3f),
+                .aspectRatio(4f / 3f)
+                .clickable { onOpenFullScreen(selectedPhotoPath) },
         ) {
             AsyncImage(
                 model = File(selectedPhotoPath),
@@ -908,6 +919,41 @@ private fun PhotoGallery(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FullScreenPhotoViewer(
+    photoPath: String,
+    onDismiss: () -> Unit,
+) {
+    BackHandler(onBack = onDismiss)
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.92f)),
+    ) {
+        AsyncImage(
+            model = File(photoPath),
+            contentDescription = "Full screen item photo",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+        )
+        IconButton(
+            onClick = onDismiss,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                    shape = RoundedCornerShape(8.dp),
+                ),
+        ) {
+            Icon(Icons.Default.Close, contentDescription = "Close photo")
         }
     }
 }
