@@ -14,6 +14,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.KeyboardOptions
@@ -51,6 +52,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -83,6 +85,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -94,6 +97,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
+import com.nils.artifact.label.ArtifactLabelRenderer
 import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
@@ -144,6 +148,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
     var screenName by rememberSaveable { mutableStateOf(Screen.Home.name) }
     var returnScreenName by rememberSaveable { mutableStateOf(Screen.Home.name) }
     var selectedItemId by rememberSaveable { mutableStateOf<String?>(null) }
+    var labelPreviewItem by remember { mutableStateOf<ArtifactItem?>(null) }
     val screen = remember(screenName) { Screen.valueOf(screenName) }
     val items by viewModel.items.collectAsState()
     val catalog by viewModel.catalog.collectAsState()
@@ -221,17 +226,32 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                 Screen.Add -> AddItemScreen(
                     viewModel = viewModel,
                     onDone = { screenName = Screen.Browse.name },
+                    onPrintLabel = { item ->
+                        labelPreviewItem = item
+                        selectedItemId = item.id
+                        returnScreenName = Screen.Browse.name
+                        screenName = Screen.Detail.name
+                    },
                 )
 
                 Screen.Detail -> DetailScreen(
                     artifact = items.firstOrNull { artifact -> artifact.item.id == selectedItemId },
                     catalog = catalog,
                     onUpdate = viewModel::updateItem,
+                    onPrintLabel = { item -> labelPreviewItem = item },
                 )
 
                 Screen.Settings -> CollectionSettingsScreen(
                     settings = collectionSettings,
                     onSave = viewModel::saveCollectionSettings,
+                )
+            }
+
+            labelPreviewItem?.let { item ->
+                LabelPreviewDialog(
+                    item = item,
+                    settings = collectionSettings,
+                    onDismiss = { labelPreviewItem = null },
                 )
             }
         }
@@ -594,6 +614,7 @@ private fun CollectionSettingsScreen(
 private fun AddItemScreen(
     viewModel: ArtifactViewModel,
     onDone: () -> Unit,
+    onPrintLabel: (ArtifactItem) -> Unit,
 ) {
     val catalog by viewModel.catalog.collectAsState()
     var manufacturer by rememberSaveable { mutableStateOf("") }
@@ -722,7 +743,7 @@ private fun AddItemScreen(
                     location = location,
                     notes = notes,
                     photoPaths = photoPaths.toList(),
-                    onComplete = onDone,
+                    onComplete = { onDone() },
                 )
             },
             enabled = canSave,
@@ -732,6 +753,30 @@ private fun AddItemScreen(
             Icon(Icons.Default.Check, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text("Save Item")
+        }
+        OutlinedButton(
+            onClick = {
+                viewModel.addItem(
+                    manufacturerId = selectedManufacturer?.id,
+                    manufacturer = manufacturer,
+                    modelId = selectedModel?.id,
+                    itemType = itemType,
+                    productionYearStart = selectedModel?.productionYearStart,
+                    productionYearEnd = selectedModel?.productionYearEnd,
+                    serialNumber = serialNumber,
+                    location = location,
+                    notes = notes,
+                    photoPaths = photoPaths.toList(),
+                    onComplete = onPrintLabel,
+                )
+            },
+            enabled = canSave,
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.Print, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Save & Print Label")
         }
     }
 }
@@ -807,6 +852,7 @@ private fun DetailScreen(
     artifact: ArtifactWithPhotos?,
     catalog: CatalogData,
     onUpdate: (ArtifactItem) -> Unit,
+    onPrintLabel: (ArtifactItem) -> Unit,
 ) {
     if (artifact == null) {
         EmptyState(
@@ -844,6 +890,15 @@ private fun DetailScreen(
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
         )
+        Button(
+            onClick = { onPrintLabel(item) },
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.Print, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Print Label")
+        }
 
         PhotoGallery(
             photoPaths = photoPaths,
@@ -980,6 +1035,69 @@ private fun DetailScreen(
             onDismiss = { fullscreenPhotoPath = null },
         )
     }
+}
+
+@Composable
+private fun LabelPreviewDialog(
+    item: ArtifactItem,
+    settings: CollectionSettings,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val labelBitmap = remember(item, settings) {
+        ArtifactLabelRenderer.render(item = item, settings = settings)
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Label #${item.catalogUid}") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                    color = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Image(
+                        bitmap = labelBitmap.asImageBitmap(),
+                        contentDescription = "Generated label preview",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(
+                                ArtifactLabelRenderer.WIDTH.toFloat() /
+                                    ArtifactLabelRenderer.HEIGHT.toFloat(),
+                            )
+                            .padding(8.dp),
+                    )
+                }
+                Text(
+                    text = "${ArtifactLabelRenderer.WIDTH}x${ArtifactLabelRenderer.HEIGHT} black/white label",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    ArtifactLabelRenderer.print(
+                        context = context,
+                        bitmap = labelBitmap,
+                        uid = item.catalogUid,
+                    )
+                    onDismiss()
+                },
+            ) {
+                Text("Print")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close")
+            }
+        },
+    )
 }
 
 @Composable

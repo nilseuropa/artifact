@@ -67,10 +67,10 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
         location: String,
         notes: String,
         photoPaths: List<String>,
-        onComplete: () -> Unit,
+        onComplete: (ArtifactItem) -> Unit,
     ) {
         viewModelScope.launch {
-            repository.addItem(
+            val item = repository.addItem(
                 manufacturerId = manufacturerId,
                 manufacturer = manufacturer,
                 modelId = modelId,
@@ -82,7 +82,7 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
                 notes = notes,
                 photoPaths = photoPaths,
             )
-            onComplete()
+            onComplete(item)
         }
     }
 

@@ -55,6 +55,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+    implementation("androidx.print:print:1.0.0")
 
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material:material-icons-extended")
@@ -73,4 +74,5 @@ dependencies {
     implementation("androidx.camera:camera-view:1.3.4")
 
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("com.google.zxing:core:3.5.3")
 }

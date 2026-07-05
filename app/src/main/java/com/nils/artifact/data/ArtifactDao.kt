@@ -47,8 +47,9 @@ interface ArtifactDao {
     suspend fun deleteItem(item: ArtifactItem)
 
     @Transaction
-    suspend fun insertItemWithPhotos(item: ArtifactItem, photos: List<ArtifactPhoto>) {
+    suspend fun insertItemWithPhotos(item: ArtifactItem, photos: List<ArtifactPhoto>): ArtifactItem {
         val uid = nextCatalogUid()
+        val itemWithUid = item.copy(catalogUid = uid)
         insertUidAllocation(
             CatalogUidAllocation(
                 uid = uid,
@@ -56,7 +57,8 @@ interface ArtifactDao {
                 allocatedAt = item.createdAt,
             ),
         )
-        insertItem(item.copy(catalogUid = uid))
+        insertItem(itemWithUid)
         insertPhotos(photos)
+        return itemWithUid
     }
 }

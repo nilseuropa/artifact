@@ -25,7 +25,7 @@ class ArtifactRepository(private val dao: ArtifactDao) {
         location: String,
         notes: String,
         photoPaths: List<String>,
-    ) {
+    ): ArtifactItem {
         val now = System.currentTimeMillis()
         val item = ArtifactItem(
             manufacturerId = manufacturerId,
@@ -47,7 +47,7 @@ class ArtifactRepository(private val dao: ArtifactDao) {
                 createdAt = now,
             )
         }
-        dao.insertItemWithPhotos(item, photos)
+        return dao.insertItemWithPhotos(item, photos)
     }
 
     suspend fun deleteItem(item: ArtifactItem) {
