@@ -100,4 +100,11 @@ interface ArtifactDao {
         insertItems(items)
         insertPhotos(photos)
     }
+
+    @Transaction
+    suspend fun clearCollection() {
+        clearPhotos()
+        clearItems()
+        clearUidAllocations()
+    }
 }

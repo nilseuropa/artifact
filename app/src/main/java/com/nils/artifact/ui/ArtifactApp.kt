@@ -65,6 +65,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -292,6 +293,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                     onSave = viewModel::saveCollectionSettings,
                     onExportBackup = viewModel::exportBackup,
                     onRestoreBackup = viewModel::restoreBackup,
+                    onClearCollection = viewModel::clearCollection,
                 )
             }
 
@@ -673,6 +675,7 @@ private fun CollectionSettingsScreen(
     onSave: (CollectionSettings) -> Unit,
     onExportBackup: (Uri, (Result<String>) -> Unit) -> Unit,
     onRestoreBackup: (Uri, (Result<String>) -> Unit) -> Unit,
+    onClearCollection: ((Result<String>) -> Unit) -> Unit,
 ) {
     var collectionName by rememberSaveable(settings.collectionName) {
         mutableStateOf(settings.collectionName)
@@ -691,16 +694,17 @@ private fun CollectionSettingsScreen(
     }
     var savedMessageVisible by remember { mutableStateOf(false) }
     var backupMessage by remember { mutableStateOf<String?>(null) }
-    var backupInProgress by remember { mutableStateOf(false) }
+    var collectionOperationInProgress by remember { mutableStateOf(false) }
     var restoreUri by remember { mutableStateOf<Uri?>(null) }
+    var clearCollectionRequested by remember { mutableStateOf(false) }
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/zip"),
     ) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
-        backupInProgress = true
+        collectionOperationInProgress = true
         backupMessage = "Exporting backup..."
         onExportBackup(uri) { result ->
-            backupInProgress = false
+            collectionOperationInProgress = false
             backupMessage = result.fold(
                 onSuccess = { message -> message },
                 onFailure = { error -> error.message ?: "Backup export failed." },
@@ -805,7 +809,7 @@ private fun CollectionSettingsScreen(
                 savedMessageVisible = false
                 exportLauncher.launch(defaultBackupFileName())
             },
-            enabled = !backupInProgress,
+            enabled = !collectionOperationInProgress,
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -823,13 +827,30 @@ private fun CollectionSettingsScreen(
                     ),
                 )
             },
-            enabled = !backupInProgress,
+            enabled = !collectionOperationInProgress,
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Icon(Icons.Default.FileDownload, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text("Restore Backup")
+        }
+        OutlinedButton(
+            onClick = { clearCollectionRequested = true },
+            enabled = !collectionOperationInProgress,
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
+            ),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.Delete, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Clear Collection")
         }
         backupMessage?.let { message ->
             Text(
@@ -838,7 +859,8 @@ private fun CollectionSettingsScreen(
                 color = if (message.contains("failed", ignoreCase = true) ||
                     message.contains("missing", ignoreCase = true) ||
                     message.contains("invalid", ignoreCase = true) ||
-                    message.contains("unsupported", ignoreCase = true)
+                    message.contains("unsupported", ignoreCase = true) ||
+                    message.contains("could not", ignoreCase = true)
                 ) {
                     MaterialTheme.colorScheme.error
                 } else {
@@ -859,10 +881,10 @@ private fun CollectionSettingsScreen(
                 TextButton(
                     onClick = {
                         restoreUri = null
-                        backupInProgress = true
+                        collectionOperationInProgress = true
                         backupMessage = "Restoring backup..."
                         onRestoreBackup(uri) { result ->
-                            backupInProgress = false
+                            collectionOperationInProgress = false
                             backupMessage = result.fold(
                                 onSuccess = { message -> message },
                                 onFailure = { error -> error.message ?: "Backup restore failed." },
@@ -875,6 +897,42 @@ private fun CollectionSettingsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { restoreUri = null }) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
+
+    if (clearCollectionRequested) {
+        AlertDialog(
+            onDismissRequest = { clearCollectionRequested = false },
+            title = { Text("Clear Collection") },
+            text = {
+                Text("This will delete all local items, photos, and UID history. Existing backup files are not touched, and the next item will use UID #1.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        clearCollectionRequested = false
+                        collectionOperationInProgress = true
+                        backupMessage = "Clearing collection..."
+                        onClearCollection { result ->
+                            collectionOperationInProgress = false
+                            backupMessage = result.fold(
+                                onSuccess = { message -> message },
+                                onFailure = { error -> error.message ?: "Collection clear failed." },
+                            )
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Text("Clear")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { clearCollectionRequested = false }) {
                     Text("Cancel")
                 }
             },

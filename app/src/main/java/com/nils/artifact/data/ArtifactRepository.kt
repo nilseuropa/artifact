@@ -87,10 +87,25 @@ class ArtifactRepository(private val dao: ArtifactDao) {
         )
         return previousPhotoPaths
     }
+
+    suspend fun clearCollection(): ArtifactClearResult {
+        val items = dao.getAllItems()
+        val photoPaths = dao.getAllPhotos().map { photo -> photo.filePath }
+        dao.clearCollection()
+        return ArtifactClearResult(
+            itemCount = items.size,
+            photoPaths = photoPaths,
+        )
+    }
 }
 
 data class ArtifactBackupSnapshot(
     val items: List<ArtifactItem>,
     val photos: List<ArtifactPhoto>,
     val uidAllocations: List<CatalogUidAllocation>,
+)
+
+data class ArtifactClearResult(
+    val itemCount: Int,
+    val photoPaths: List<String>,
 )

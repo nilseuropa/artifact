@@ -184,4 +184,19 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
             onComplete(result)
         }
     }
+
+    fun clearCollection(onComplete: (Result<String>) -> Unit) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    val clearResult = repository.clearCollection()
+                    clearResult.photoPaths.forEach { path ->
+                        runCatching { File(path).delete() }
+                    }
+                    "Cleared ${clearResult.itemCount} items. Next item UID will be #1."
+                }
+            }
+            onComplete(result)
+        }
+    }
 }
