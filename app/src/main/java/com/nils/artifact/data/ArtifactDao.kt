@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -35,6 +36,9 @@ interface ArtifactDao {
 
     @Insert
     suspend fun insertPhotos(photos: List<ArtifactPhoto>)
+
+    @Update
+    suspend fun updateItem(item: ArtifactItem)
 
     @Query("SELECT COALESCE(MAX(uid), 0) + 1 FROM catalog_uid_allocations")
     suspend fun nextCatalogUid(): Long

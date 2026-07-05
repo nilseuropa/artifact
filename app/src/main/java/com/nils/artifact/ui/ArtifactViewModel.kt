@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.nils.artifact.data.ArtifactDatabase
+import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactRepository
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
@@ -87,6 +88,12 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
                     runCatching { File(photo.filePath).delete() }
                 }
             }
+        }
+    }
+
+    fun updateItem(item: ArtifactItem) {
+        viewModelScope.launch {
+            repository.updateItem(item)
         }
     }
 }

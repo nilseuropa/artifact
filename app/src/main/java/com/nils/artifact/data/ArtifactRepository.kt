@@ -53,4 +53,8 @@ class ArtifactRepository(private val dao: ArtifactDao) {
     suspend fun deleteItem(item: ArtifactItem) {
         dao.deleteItem(item)
     }
+
+    suspend fun updateItem(item: ArtifactItem) {
+        dao.updateItem(item.copy(updatedAt = System.currentTimeMillis()))
+    }
 }

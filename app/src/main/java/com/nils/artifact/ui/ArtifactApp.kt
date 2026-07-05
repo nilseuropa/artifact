@@ -16,11 +16,13 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
@@ -45,10 +47,12 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -61,6 +65,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -82,11 +87,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
+import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
 import com.nils.artifact.data.CatalogManufacturer
@@ -101,6 +108,7 @@ private enum class Screen {
     Search,
     Manage,
     Add,
+    Detail,
 }
 
 private data class ModelSuggestion(
@@ -114,15 +122,45 @@ private data class TextSuggestion(
     val onClick: () -> Unit,
 )
 
+private data class EditTextTarget(
+    val title: String,
+    val initialValue: String,
+    val singleLine: Boolean,
+    val onSave: (String) -> Unit,
+)
+
+private data class EditYearsTarget(
+    val initialStart: Int?,
+    val initialEnd: Int?,
+    val onSave: (Int?, Int?) -> Unit,
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtifactApp(viewModel: ArtifactViewModel) {
     var screenName by rememberSaveable { mutableStateOf(Screen.Home.name) }
+    var returnScreenName by rememberSaveable { mutableStateOf(Screen.Home.name) }
+    var selectedItemId by rememberSaveable { mutableStateOf<String?>(null) }
     val screen = remember(screenName) { Screen.valueOf(screenName) }
     val items by viewModel.items.collectAsState()
+    val catalog by viewModel.catalog.collectAsState()
+
+    fun openDetail(returnScreen: Screen, artifact: ArtifactWithPhotos) {
+        selectedItemId = artifact.item.id
+        returnScreenName = returnScreen.name
+        screenName = Screen.Detail.name
+    }
+
+    fun navigateBack() {
+        screenName = if (screen == Screen.Detail) {
+            returnScreenName
+        } else {
+            Screen.Home.name
+        }
+    }
 
     BackHandler(enabled = screen != Screen.Home) {
-        screenName = Screen.Home.name
+        navigateBack()
     }
 
     Scaffold(
@@ -132,7 +170,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                 title = { Text(screen.title()) },
                 navigationIcon = {
                     if (screen != Screen.Home) {
-                        IconButton(onClick = { screenName = Screen.Home.name }) {
+                        IconButton(onClick = ::navigateBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }
@@ -158,16 +196,31 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                     onAdd = { screenName = Screen.Add.name },
                 )
 
-                Screen.Browse -> BrowseScreen(items = items)
-                Screen.Search -> SearchScreen(viewModel = viewModel)
+                Screen.Browse -> BrowseScreen(
+                    items = items,
+                    onOpen = { artifact -> openDetail(Screen.Browse, artifact) },
+                )
+
+                Screen.Search -> SearchScreen(
+                    viewModel = viewModel,
+                    onOpen = { artifact -> openDetail(Screen.Search, artifact) },
+                )
+
                 Screen.Manage -> ManageScreen(
                     items = items,
                     onDelete = viewModel::deleteItem,
+                    onOpen = { artifact -> openDetail(Screen.Manage, artifact) },
                 )
 
                 Screen.Add -> AddItemScreen(
                     viewModel = viewModel,
                     onDone = { screenName = Screen.Browse.name },
+                )
+
+                Screen.Detail -> DetailScreen(
+                    artifact = items.firstOrNull { artifact -> artifact.item.id == selectedItemId },
+                    catalog = catalog,
+                    onUpdate = viewModel::updateItem,
                 )
             }
         }
@@ -181,6 +234,7 @@ private fun Screen.title(): String =
         Screen.Search -> "Search"
         Screen.Manage -> "Manage Collection"
         Screen.Add -> "Add New Item"
+        Screen.Detail -> "Item Details"
     }
 
 @Composable
@@ -276,16 +330,23 @@ private fun MenuAction(
 }
 
 @Composable
-private fun BrowseScreen(items: List<ArtifactWithPhotos>) {
+private fun BrowseScreen(
+    items: List<ArtifactWithPhotos>,
+    onOpen: (ArtifactWithPhotos) -> Unit,
+) {
     CollectionList(
         items = items,
         emptyTitle = "No items yet",
         emptyBody = "Add a new item to start the local catalog.",
+        onItemClick = onOpen,
     )
 }
 
 @Composable
-private fun SearchScreen(viewModel: ArtifactViewModel) {
+private fun SearchScreen(
+    viewModel: ArtifactViewModel,
+    onOpen: (ArtifactWithPhotos) -> Unit,
+) {
     val query by viewModel.searchQuery.collectAsState()
     val results by viewModel.searchResults.collectAsState()
 
@@ -312,6 +373,7 @@ private fun SearchScreen(viewModel: ArtifactViewModel) {
                 "Try a different catalog field."
             },
             contentPadding = PaddingValues(0.dp),
+            onItemClick = onOpen,
         )
     }
 }
@@ -320,6 +382,7 @@ private fun SearchScreen(viewModel: ArtifactViewModel) {
 private fun ManageScreen(
     items: List<ArtifactWithPhotos>,
     onDelete: (ArtifactWithPhotos) -> Unit,
+    onOpen: (ArtifactWithPhotos) -> Unit,
 ) {
     val locationCount = items
         .map { it.item.location.trim() }
@@ -353,6 +416,7 @@ private fun ManageScreen(
             emptyTitle = "Nothing to manage",
             emptyBody = "Catalog entries will appear here.",
             contentPadding = PaddingValues(0.dp),
+            onItemClick = onOpen,
             trailing = { artifact ->
                 IconButton(onClick = { onDelete(artifact) }) {
                     Icon(Icons.Default.Delete, contentDescription = "Delete")
@@ -601,6 +665,437 @@ private fun SuggestionTextField(
 }
 
 @Composable
+private fun DetailScreen(
+    artifact: ArtifactWithPhotos?,
+    catalog: CatalogData,
+    onUpdate: (ArtifactItem) -> Unit,
+) {
+    if (artifact == null) {
+        EmptyState(
+            title = "Item not found",
+            body = "The selected catalog item is no longer available.",
+            modifier = Modifier.fillMaxSize(),
+        )
+        return
+    }
+
+    val item = artifact.item
+    var selectedPhotoPath by rememberSaveable(item.id) {
+        mutableStateOf(artifact.photos.firstOrNull()?.filePath)
+    }
+    var editTextTarget by remember { mutableStateOf<EditTextTarget?>(null) }
+    var editYearsTarget by remember { mutableStateOf<EditYearsTarget?>(null) }
+    val photoPaths = artifact.photos.map { photo -> photo.filePath }
+
+    LaunchedEffect(item.id, photoPaths) {
+        if (selectedPhotoPath !in photoPaths) {
+            selectedPhotoPath = photoPaths.firstOrNull()
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Text(
+            text = "#${item.catalogUid} ${item.manufacturer.ifBlank { "Unknown manufacturer" }}",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+        )
+
+        PhotoGallery(
+            photoPaths = photoPaths,
+            selectedPhotoPath = selectedPhotoPath,
+            onSelectPhoto = { path -> selectedPhotoPath = path },
+        )
+
+        DetailReadOnlyRow(label = "UID", value = "#${item.catalogUid}")
+        DetailEditableRow(
+            label = "Manufacturer",
+            value = item.manufacturer.ifBlank { "Not recorded" },
+            onEdit = {
+                editTextTarget = EditTextTarget(
+                    title = "Manufacturer",
+                    initialValue = item.manufacturer,
+                    singleLine = true,
+                    onSave = { value ->
+                        val cleanValue = value.trim()
+                        val selectedManufacturer = catalog.findManufacturer(cleanValue)
+                        val selectedModel = catalog.findModel(selectedManufacturer, item.itemType)
+                        onUpdate(
+                            item.copy(
+                                manufacturerId = selectedManufacturer?.id,
+                                manufacturer = cleanValue,
+                                modelId = selectedModel?.id,
+                                productionYearStart = selectedModel?.productionYearStart,
+                                productionYearEnd = selectedModel?.productionYearEnd,
+                            ),
+                        )
+                    },
+                )
+            },
+        )
+        DetailEditableRow(
+            label = "Type",
+            value = item.itemType.ifBlank { "Not recorded" },
+            onEdit = {
+                editTextTarget = EditTextTarget(
+                    title = "Type",
+                    initialValue = item.itemType,
+                    singleLine = true,
+                    onSave = { value ->
+                        val cleanValue = value.trim()
+                        val selectedManufacturer = catalog.findManufacturer(item.manufacturer)
+                        val selectedModel = catalog.findModel(selectedManufacturer, cleanValue)
+                        onUpdate(
+                            item.copy(
+                                modelId = selectedModel?.id,
+                                itemType = cleanValue,
+                                productionYearStart = selectedModel?.productionYearStart,
+                                productionYearEnd = selectedModel?.productionYearEnd,
+                            ),
+                        )
+                    },
+                )
+            },
+        )
+        DetailEditableRow(
+            label = "Production years",
+            value = item.productionYearsLabel() ?: "Not recorded",
+            onEdit = {
+                editYearsTarget = EditYearsTarget(
+                    initialStart = item.productionYearStart,
+                    initialEnd = item.productionYearEnd,
+                    onSave = { start, end ->
+                        onUpdate(
+                            item.copy(
+                                productionYearStart = start,
+                                productionYearEnd = end,
+                            ),
+                        )
+                    },
+                )
+            },
+        )
+        DetailEditableRow(
+            label = "Serial number",
+            value = item.serialNumber.ifBlank { "Not recorded" },
+            onEdit = {
+                editTextTarget = EditTextTarget(
+                    title = "Serial number",
+                    initialValue = item.serialNumber,
+                    singleLine = true,
+                    onSave = { value -> onUpdate(item.copy(serialNumber = value.trim())) },
+                )
+            },
+        )
+        DetailEditableRow(
+            label = "Location",
+            value = item.location.ifBlank { "Not recorded" },
+            onEdit = {
+                editTextTarget = EditTextTarget(
+                    title = "Location",
+                    initialValue = item.location,
+                    singleLine = true,
+                    onSave = { value -> onUpdate(item.copy(location = value.trim())) },
+                )
+            },
+        )
+        DetailEditableRow(
+            label = "Notes",
+            value = item.notes.ifBlank { "Not recorded" },
+            onEdit = {
+                editTextTarget = EditTextTarget(
+                    title = "Notes",
+                    initialValue = item.notes,
+                    singleLine = false,
+                    onSave = { value -> onUpdate(item.copy(notes = value.trim())) },
+                )
+            },
+        )
+        DetailReadOnlyRow(label = "Added", value = formatTimestamp(item.createdAt))
+        DetailReadOnlyRow(label = "Updated", value = formatTimestamp(item.updatedAt))
+    }
+
+    editTextTarget?.let { target ->
+        EditTextDialog(
+            target = target,
+            onDismiss = { editTextTarget = null },
+        )
+    }
+
+    editYearsTarget?.let { target ->
+        EditYearsDialog(
+            target = target,
+            onDismiss = { editYearsTarget = null },
+        )
+    }
+}
+
+@Composable
+private fun PhotoGallery(
+    photoPaths: List<String>,
+    selectedPhotoPath: String?,
+    onSelectPhoto: (String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = "Photos",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        if (selectedPhotoPath == null) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(4f / 3f),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "No photos",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            return
+        }
+
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(4f / 3f),
+        ) {
+            AsyncImage(
+                model = File(selectedPhotoPath),
+                contentDescription = "Selected item photo",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+            )
+        }
+
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(photoPaths, key = { it }) { path ->
+                val selected = path == selectedPhotoPath
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(
+                        width = if (selected) 2.dp else 1.dp,
+                        color = if (selected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                        },
+                    ),
+                    modifier = Modifier
+                        .size(76.dp)
+                        .clickable { onSelectPhoto(path) },
+                ) {
+                    AsyncImage(
+                        model = File(path),
+                        contentDescription = "Item photo thumbnail",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DetailReadOnlyRow(
+    label: String,
+    value: String,
+) {
+    DetailRowSurface {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            DetailLabel(label = label)
+            DetailValue(value = value)
+        }
+    }
+}
+
+@Composable
+private fun DetailEditableRow(
+    label: String,
+    value: String,
+    onEdit: () -> Unit,
+) {
+    DetailRowSurface {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            DetailLabel(label = label)
+            DetailValue(value = value)
+        }
+        IconButton(onClick = onEdit) {
+            Icon(Icons.Default.Edit, contentDescription = "Edit $label")
+        }
+    }
+}
+
+@Composable
+private fun DetailRowSurface(content: @Composable RowScope.() -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun DetailLabel(label: String) {
+    Text(
+        text = label,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+@Composable
+private fun DetailValue(value: String) {
+    Text(
+        text = value,
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface,
+    )
+}
+
+@Composable
+private fun EditTextDialog(
+    target: EditTextTarget,
+    onDismiss: () -> Unit,
+) {
+    var value by remember(target) { mutableStateOf(target.initialValue) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit ${target.title}") },
+        text = {
+            OutlinedTextField(
+                value = value,
+                onValueChange = { value = it },
+                label = { Text(target.title) },
+                singleLine = target.singleLine,
+                minLines = if (target.singleLine) 1 else 4,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    target.onSave(value)
+                    onDismiss()
+                },
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+    )
+}
+
+@Composable
+private fun EditYearsDialog(
+    target: EditYearsTarget,
+    onDismiss: () -> Unit,
+) {
+    var start by remember(target) { mutableStateOf(target.initialStart?.toString() ?: "") }
+    var end by remember(target) { mutableStateOf(target.initialEnd?.toString() ?: "") }
+    val parsedStart = start.trim().takeIf { it.isNotEmpty() }?.toIntOrNull()
+    val parsedEnd = end.trim().takeIf { it.isNotEmpty() }?.toIntOrNull()
+    val hasInvalidNumber = (start.isNotBlank() && parsedStart == null) ||
+        (end.isNotBlank() && parsedEnd == null)
+    val hasInvalidOrder = parsedStart != null && parsedEnd != null && parsedStart > parsedEnd
+    val canSave = !hasInvalidNumber && !hasInvalidOrder
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Production Years") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = start,
+                    onValueChange = { start = it },
+                    label = { Text("Start year") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = end,
+                    onValueChange = { end = it },
+                    label = { Text("End year") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                if (hasInvalidNumber) {
+                    Text(
+                        text = "Years must be numbers.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                } else if (hasInvalidOrder) {
+                    Text(
+                        text = "Start year must not be after end year.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = canSave,
+                onClick = {
+                    target.onSave(parsedStart, parsedEnd)
+                    onDismiss()
+                },
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+    )
+}
+
+@Composable
 private fun CameraPermissionCapture(
     onPhotoCaptured: (String) -> Unit,
     onError: (String) -> Unit,
@@ -832,6 +1327,7 @@ private fun CollectionList(
     emptyTitle: String,
     emptyBody: String,
     contentPadding: PaddingValues = PaddingValues(16.dp),
+    onItemClick: (ArtifactWithPhotos) -> Unit = {},
     trailing: @Composable ((ArtifactWithPhotos) -> Unit)? = null,
 ) {
     if (items.isEmpty()) {
@@ -853,6 +1349,7 @@ private fun CollectionList(
         items(items, key = { it.item.id }) { artifact ->
             ArtifactListItem(
                 artifact = artifact,
+                onClick = { onItemClick(artifact) },
                 trailing = trailing,
             )
         }
@@ -862,6 +1359,7 @@ private fun CollectionList(
 @Composable
 private fun ArtifactListItem(
     artifact: ArtifactWithPhotos,
+    onClick: () -> Unit,
     trailing: @Composable ((ArtifactWithPhotos) -> Unit)?,
 ) {
     val item = artifact.item
@@ -869,7 +1367,9 @@ private fun ArtifactListItem(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -1027,6 +1527,12 @@ private fun CatalogModel.productionYearsLabel(): String? =
 
 private fun com.nils.artifact.data.ArtifactItem.productionYearsLabel(): String? =
     productionYearsLabel(productionYearStart, productionYearEnd)
+
+private fun formatTimestamp(timestamp: Long): String =
+    DateFormat.getDateTimeInstance(
+        DateFormat.SHORT,
+        DateFormat.SHORT,
+    ).format(Date(timestamp))
 
 private fun productionYearsLabel(start: Int?, end: Int?): String? =
     when {
