@@ -9,6 +9,8 @@ import com.nils.artifact.data.ArtifactRepository
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
 import com.nils.artifact.data.CatalogSeed
+import com.nils.artifact.data.CollectionSettings
+import com.nils.artifact.data.CollectionSettingsStore
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,9 +28,13 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
     private val repository = ArtifactRepository(
         ArtifactDatabase.get(application).artifactDao(),
     )
+    private val settingsStore = CollectionSettingsStore(application)
 
     private val _catalog = MutableStateFlow(CatalogData.Empty)
     val catalog: StateFlow<CatalogData> = _catalog.asStateFlow()
+
+    private val _collectionSettings = MutableStateFlow(settingsStore.load())
+    val collectionSettings: StateFlow<CollectionSettings> = _collectionSettings.asStateFlow()
 
     val items: StateFlow<List<ArtifactWithPhotos>> = repository.observeItems()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -94,6 +100,13 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
     fun updateItem(item: ArtifactItem) {
         viewModelScope.launch {
             repository.updateItem(item)
+        }
+    }
+
+    fun saveCollectionSettings(settings: CollectionSettings) {
+        _collectionSettings.value = settings
+        viewModelScope.launch(Dispatchers.IO) {
+            settingsStore.save(settings)
         }
     }
 }

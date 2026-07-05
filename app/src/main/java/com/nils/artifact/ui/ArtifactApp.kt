@@ -52,6 +52,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -98,6 +99,7 @@ import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
 import com.nils.artifact.data.CatalogManufacturer
 import com.nils.artifact.data.CatalogModel
+import com.nils.artifact.data.CollectionSettings
 import java.io.File
 import java.text.DateFormat
 import java.util.Date
@@ -109,6 +111,7 @@ private enum class Screen {
     Manage,
     Add,
     Detail,
+    Settings,
 }
 
 private data class ModelSuggestion(
@@ -144,6 +147,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
     val screen = remember(screenName) { Screen.valueOf(screenName) }
     val items by viewModel.items.collectAsState()
     val catalog by viewModel.catalog.collectAsState()
+    val collectionSettings by viewModel.collectionSettings.collectAsState()
 
     fun openDetail(returnScreen: Screen, artifact: ArtifactWithPhotos) {
         selectedItemId = artifact.item.id
@@ -190,10 +194,12 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
             when (screen) {
                 Screen.Home -> HomeScreen(
                     itemCount = items.size,
+                    collectionSettings = collectionSettings,
                     onBrowse = { screenName = Screen.Browse.name },
                     onSearch = { screenName = Screen.Search.name },
                     onManage = { screenName = Screen.Manage.name },
                     onAdd = { screenName = Screen.Add.name },
+                    onSettings = { screenName = Screen.Settings.name },
                 )
 
                 Screen.Browse -> BrowseScreen(
@@ -222,6 +228,11 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                     catalog = catalog,
                     onUpdate = viewModel::updateItem,
                 )
+
+                Screen.Settings -> CollectionSettingsScreen(
+                    settings = collectionSettings,
+                    onSave = viewModel::saveCollectionSettings,
+                )
             }
         }
     }
@@ -235,15 +246,18 @@ private fun Screen.title(): String =
         Screen.Manage -> "Manage Collection"
         Screen.Add -> "Add New Item"
         Screen.Detail -> "Item Details"
+        Screen.Settings -> "Collection Settings"
     }
 
 @Composable
 private fun HomeScreen(
     itemCount: Int,
+    collectionSettings: CollectionSettings,
     onBrowse: () -> Unit,
     onSearch: () -> Unit,
     onManage: () -> Unit,
     onAdd: () -> Unit,
+    onSettings: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -253,10 +267,17 @@ private fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         Text(
-            text = "Retro computing catalog",
+            text = collectionSettings.collectionName.ifBlank { "Retro computing catalog" },
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        collectionSettings.ownerName.takeIf { it.isNotBlank() }?.let { ownerName ->
+            Text(
+                text = "Owner: $ownerName",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         Text(
             text = "$itemCount item${if (itemCount == 1) "" else "s"} stored locally",
             style = MaterialTheme.typography.bodyMedium,
@@ -286,6 +307,12 @@ private fun HomeScreen(
             supportingText = "Capture photos and catalog details",
             icon = { Icon(Icons.Default.Add, contentDescription = null) },
             onClick = onAdd,
+        )
+        MenuAction(
+            label = "Collection Settings",
+            supportingText = "Collection name and owner details",
+            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+            onClick = onSettings,
         )
     }
 }
@@ -447,6 +474,117 @@ private fun StatBlock(label: String, value: String, modifier: Modifier = Modifie
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CollectionSettingsScreen(
+    settings: CollectionSettings,
+    onSave: (CollectionSettings) -> Unit,
+) {
+    var collectionName by rememberSaveable(settings.collectionName) {
+        mutableStateOf(settings.collectionName)
+    }
+    var ownerName by rememberSaveable(settings.ownerName) {
+        mutableStateOf(settings.ownerName)
+    }
+    var ownerEmail by rememberSaveable(settings.ownerEmail) {
+        mutableStateOf(settings.ownerEmail)
+    }
+    var ownerPhone by rememberSaveable(settings.ownerPhone) {
+        mutableStateOf(settings.ownerPhone)
+    }
+    var ownerNotes by rememberSaveable(settings.ownerNotes) {
+        mutableStateOf(settings.ownerNotes)
+    }
+    var savedMessageVisible by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        OutlinedTextField(
+            value = collectionName,
+            onValueChange = {
+                collectionName = it
+                savedMessageVisible = false
+            },
+            label = { Text("Collection name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            value = ownerName,
+            onValueChange = {
+                ownerName = it
+                savedMessageVisible = false
+            },
+            label = { Text("Owner name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            value = ownerEmail,
+            onValueChange = {
+                ownerEmail = it
+                savedMessageVisible = false
+            },
+            label = { Text("Owner email") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            value = ownerPhone,
+            onValueChange = {
+                ownerPhone = it
+                savedMessageVisible = false
+            },
+            label = { Text("Owner phone") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            value = ownerNotes,
+            onValueChange = {
+                ownerNotes = it
+                savedMessageVisible = false
+            },
+            label = { Text("Owner notes") },
+            minLines = 3,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Button(
+            onClick = {
+                onSave(
+                    CollectionSettings(
+                        collectionName = collectionName,
+                        ownerName = ownerName,
+                        ownerEmail = ownerEmail,
+                        ownerPhone = ownerPhone,
+                        ownerNotes = ownerNotes,
+                    ),
+                )
+                savedMessageVisible = true
+            },
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.Check, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Save Settings")
+        }
+        if (savedMessageVisible) {
+            Text(
+                text = "Settings saved",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary,
             )
         }
     }
