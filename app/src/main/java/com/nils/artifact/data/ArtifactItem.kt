@@ -21,6 +21,7 @@ data class ArtifactItem(
     val itemType: String,
     val productionYearStart: Int?,
     val productionYearEnd: Int?,
+    val estimatedValue: Double?,
     val serialNumber: String,
     val location: String,
     val notes: String,

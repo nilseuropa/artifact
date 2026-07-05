@@ -29,7 +29,7 @@ data class ArtifactRestorePhoto(
 object ArtifactBackupArchive {
     const val FILE_EXTENSION = "artifactbackup"
     private const val FORMAT_VERSION = 1
-    private const val DATABASE_VERSION = 3
+    private const val DATABASE_VERSION = 4
 
     fun write(
         outputStream: OutputStream,
@@ -229,6 +229,12 @@ object ArtifactBackupArchive {
             ) {
                 "Backup contains invalid production years for UID #${item.catalogUid}."
             }
+            require(
+                item.estimatedValue == null ||
+                    item.estimatedValue.isFinite() && item.estimatedValue >= 0.0,
+            ) {
+                "Backup contains an invalid estimated value for UID #${item.catalogUid}."
+            }
         }
 
         val allocatedUids = mutableSetOf<Long>()
@@ -282,6 +288,7 @@ object ArtifactBackupArchive {
             .put("itemType", itemType)
             .putNullable("productionYearStart", productionYearStart)
             .putNullable("productionYearEnd", productionYearEnd)
+            .putNullable("estimatedValue", estimatedValue)
             .put("serialNumber", serialNumber)
             .put("location", location)
             .put("notes", notes)
@@ -298,6 +305,7 @@ object ArtifactBackupArchive {
             itemType = getString("itemType"),
             productionYearStart = optNullableInt("productionYearStart"),
             productionYearEnd = optNullableInt("productionYearEnd"),
+            estimatedValue = optNullableDouble("estimatedValue"),
             serialNumber = getString("serialNumber"),
             location = getString("location"),
             notes = getString("notes"),
@@ -357,11 +365,17 @@ object ArtifactBackupArchive {
     private fun JSONObject.putNullable(key: String, value: Int?): JSONObject =
         put(key, value ?: JSONObject.NULL)
 
+    private fun JSONObject.putNullable(key: String, value: Double?): JSONObject =
+        put(key, value ?: JSONObject.NULL)
+
     private fun JSONObject.optNullableString(key: String): String? =
         if (!has(key) || isNull(key)) null else getString(key)
 
     private fun JSONObject.optNullableInt(key: String): Int? =
         if (!has(key) || isNull(key)) null else getInt(key)
+
+    private fun JSONObject.optNullableDouble(key: String): Double? =
+        if (!has(key) || isNull(key)) null else getDouble(key)
 
     private fun <T> List<T>.toJsonArray(mapper: (T) -> JSONObject): JSONArray =
         JSONArray().also { array ->

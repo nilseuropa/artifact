@@ -124,6 +124,7 @@ import com.nils.artifact.label.NiimbotPrinter
 import org.json.JSONObject
 import java.io.File
 import java.text.DateFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -136,6 +137,7 @@ private enum class Screen {
     Browse,
     Search,
     Manage,
+    Summary,
     Add,
     Detail,
     Settings,
@@ -163,6 +165,11 @@ private data class EditYearsTarget(
     val initialStart: Int?,
     val initialEnd: Int?,
     val onSave: (Int?, Int?) -> Unit,
+)
+
+private data class EditValueTarget(
+    val initialValue: Double?,
+    val onSave: (Double?) -> Unit,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -227,6 +234,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                     onBrowse = { screenName = Screen.Browse.name },
                     onSearch = { screenName = Screen.Search.name },
                     onManage = { screenName = Screen.Manage.name },
+                    onSummary = { screenName = Screen.Summary.name },
                     onAdd = { screenName = Screen.Add.name },
                     onSettings = { screenName = Screen.Settings.name },
                 )
@@ -251,6 +259,8 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                     onDelete = viewModel::deleteItem,
                     onOpen = { artifact -> openDetail(Screen.Manage, artifact) },
                 )
+
+                Screen.Summary -> CollectionSummaryScreen(items = items)
 
                 Screen.Add -> AddItemScreen(
                     viewModel = viewModel,
@@ -296,6 +306,7 @@ private fun Screen.title(): String =
         Screen.Browse -> "Browse"
         Screen.Search -> "Search"
         Screen.Manage -> "Manage Collection"
+        Screen.Summary -> "Collection Summary"
         Screen.Add -> "Add New Item"
         Screen.Detail -> "Item Details"
         Screen.Settings -> "Collection Settings"
@@ -309,6 +320,7 @@ private fun HomeScreen(
     onBrowse: () -> Unit,
     onSearch: () -> Unit,
     onManage: () -> Unit,
+    onSummary: () -> Unit,
     onAdd: () -> Unit,
     onSettings: () -> Unit,
 ) {
@@ -360,6 +372,12 @@ private fun HomeScreen(
             supportingText = "Audit locations and remove entries",
             icon = { Icon(Icons.Default.Inventory2, contentDescription = null) },
             onClick = onManage,
+        )
+        MenuAction(
+            label = "Collection Summary",
+            supportingText = "Device count and total estimated value",
+            icon = { Icon(Icons.Default.Inventory2, contentDescription = null) },
+            onClick = onSummary,
         )
         MenuAction(
             label = "Add New Item",
@@ -509,6 +527,48 @@ private fun ManageScreen(
                 }
             },
         )
+    }
+}
+
+@Composable
+private fun CollectionSummaryScreen(items: List<ArtifactWithPhotos>) {
+    val valuedItems = items.filter { artifact -> artifact.item.estimatedValue != null }
+    val totalValue = valuedItems.sumOf { artifact -> artifact.item.estimatedValue ?: 0.0 }
+    val unvaluedCount = items.size - valuedItems.size
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            StatBlock(
+                label = "Devices",
+                value = items.size.toString(),
+                modifier = Modifier.weight(1f),
+            )
+            StatBlock(
+                label = "Valued",
+                value = valuedItems.size.toString(),
+                modifier = Modifier.weight(1f),
+            )
+        }
+        StatBlock(
+            label = "Total estimated value",
+            value = formatEstimatedValue(totalValue),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (unvaluedCount > 0) {
+            Text(
+                text = "$unvaluedCount device${if (unvaluedCount == 1) "" else "s"} without estimated value",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
@@ -826,13 +886,17 @@ private fun AddItemScreen(
     var itemType by rememberSaveable { mutableStateOf("") }
     var serialNumber by rememberSaveable { mutableStateOf("") }
     var location by rememberSaveable { mutableStateOf("") }
+    var estimatedValue by rememberSaveable { mutableStateOf("") }
     var notes by rememberSaveable { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val photoPaths = remember { mutableStateListOf<String>() }
+    val parsedEstimatedValue = parseEstimatedValueInput(estimatedValue)
+    val hasInvalidEstimatedValue = estimatedValue.isNotBlank() && parsedEstimatedValue == null
     val canSave = photoPaths.isNotEmpty() &&
         manufacturer.isNotBlank() &&
         itemType.isNotBlank() &&
-        location.isNotBlank()
+        location.isNotBlank() &&
+        !hasInvalidEstimatedValue
     val selectedManufacturer = catalog.findManufacturer(manufacturer)
     val selectedModel = catalog.findModel(selectedManufacturer, itemType)
     val manufacturerSuggestions = catalog.manufacturerSuggestions(manufacturer)
@@ -922,6 +986,21 @@ private fun AddItemScreen(
             modifier = Modifier.fillMaxWidth(),
         )
         OutlinedTextField(
+            value = estimatedValue,
+            onValueChange = { estimatedValue = it },
+            label = { Text("Estimated value") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (hasInvalidEstimatedValue) {
+            Text(
+                text = "Estimated value must be a non-negative number.",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        OutlinedTextField(
             value = location,
             onValueChange = { location = it },
             label = { Text("Location") },
@@ -944,6 +1023,7 @@ private fun AddItemScreen(
                     itemType = itemType,
                     productionYearStart = selectedModel?.productionYearStart,
                     productionYearEnd = selectedModel?.productionYearEnd,
+                    estimatedValue = parsedEstimatedValue,
                     serialNumber = serialNumber,
                     location = location,
                     notes = notes,
@@ -968,6 +1048,7 @@ private fun AddItemScreen(
                     itemType = itemType,
                     productionYearStart = selectedModel?.productionYearStart,
                     productionYearEnd = selectedModel?.productionYearEnd,
+                    estimatedValue = parsedEstimatedValue,
                     serialNumber = serialNumber,
                     location = location,
                     notes = notes,
@@ -1075,6 +1156,7 @@ private fun DetailScreen(
     var fullscreenPhotoPath by rememberSaveable(item.id) { mutableStateOf<String?>(null) }
     var editTextTarget by remember { mutableStateOf<EditTextTarget?>(null) }
     var editYearsTarget by remember { mutableStateOf<EditYearsTarget?>(null) }
+    var editValueTarget by remember { mutableStateOf<EditValueTarget?>(null) }
     val photoPaths = artifact.photos.map { photo -> photo.filePath }
 
     LaunchedEffect(item.id, photoPaths) {
@@ -1172,6 +1254,16 @@ private fun DetailScreen(
             },
         )
         DetailEditableRow(
+            label = "Estimated value",
+            value = item.estimatedValue?.let { value -> formatEstimatedValue(value) } ?: "Not recorded",
+            onEdit = {
+                editValueTarget = EditValueTarget(
+                    initialValue = item.estimatedValue,
+                    onSave = { value -> onUpdate(item.copy(estimatedValue = value)) },
+                )
+            },
+        )
+        DetailEditableRow(
             label = "Serial number",
             value = item.serialNumber.ifBlank { "Not recorded" },
             onEdit = {
@@ -1231,6 +1323,13 @@ private fun DetailScreen(
         EditYearsDialog(
             target = target,
             onDismiss = { editYearsTarget = null },
+        )
+    }
+
+    editValueTarget?.let { target ->
+        EditValueDialog(
+            target = target,
+            onDismiss = { editValueTarget = null },
         )
     }
 
@@ -1729,6 +1828,58 @@ private fun EditYearsDialog(
                 enabled = canSave,
                 onClick = {
                     target.onSave(parsedStart, parsedEnd)
+                    onDismiss()
+                },
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+    )
+}
+
+@Composable
+private fun EditValueDialog(
+    target: EditValueTarget,
+    onDismiss: () -> Unit,
+) {
+    var value by remember(target) {
+        mutableStateOf(target.initialValue?.let { initialValue -> formatEstimatedValueInput(initialValue) } ?: "")
+    }
+    val parsedValue = parseEstimatedValueInput(value)
+    val hasInvalidValue = value.isNotBlank() && parsedValue == null
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Estimated Value") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = { value = it },
+                    label = { Text("Estimated value") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                if (hasInvalidValue) {
+                    Text(
+                        text = "Estimated value must be a non-negative number.",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = !hasInvalidValue,
+                onClick = {
+                    target.onSave(parsedValue)
                     onDismiss()
                 },
             ) {
@@ -2392,6 +2543,28 @@ private fun formatTimestamp(timestamp: Long): String =
         DateFormat.SHORT,
         DateFormat.SHORT,
     ).format(Date(timestamp))
+
+private fun parseEstimatedValueInput(input: String): Double? {
+    val normalized = input
+        .trim()
+        .replace(" ", "")
+        .replace(',', '.')
+    if (normalized.isBlank()) return null
+    return normalized.toDoubleOrNull()?.takeIf { value -> value.isFinite() && value >= 0.0 }
+}
+
+private fun formatEstimatedValue(value: Double): String =
+    NumberFormat.getNumberInstance(Locale.getDefault()).apply {
+        minimumFractionDigits = 0
+        maximumFractionDigits = 2
+    }.format(value)
+
+private fun formatEstimatedValueInput(value: Double): String =
+    if (value % 1.0 == 0.0) {
+        value.toLong().toString()
+    } else {
+        value.toString()
+    }
 
 private fun defaultBackupFileName(): String {
     val timestamp = SimpleDateFormat("yyyy-MM-dd-HHmm", Locale.US).format(Date())
