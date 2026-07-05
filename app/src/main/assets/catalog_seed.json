@@ -1,0 +1,3466 @@
+{
+  "manufacturers": [
+    {
+      "id": "2",
+      "name": "Acorn Computers",
+      "models": [
+        {
+          "id": "2:a3000",
+          "name": "A3000",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "2:a7000",
+          "name": "A7000",
+          "productionYearStart": 1995,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "2:archimedes 310",
+          "name": "Archimedes 310",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "2:archimedes 440",
+          "name": "Archimedes 440",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "2:archimedes a3010",
+          "name": "Archimedes A3010",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "2:archimedes a3020",
+          "name": "Archimedes A3020",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "2:archimedes a4000",
+          "name": "Archimedes A4000",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "2:atom",
+          "name": "Atom",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "2:bbc master 128",
+          "name": "BBC Master 128",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "2:bbc master compact",
+          "name": "BBC Master Compact",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "2:bbc micro model a",
+          "name": "BBC Micro Model A",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "2:bbc micro model b",
+          "name": "BBC Micro Model B",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "2:electron",
+          "name": "Electron",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "2:risc pc",
+          "name": "Risc PC",
+          "productionYearStart": 1994,
+          "productionYearEnd": 2003
+        },
+        {
+          "id": "2:system 1",
+          "name": "System 1",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1979
+        },
+        {
+          "id": "2:system 2",
+          "name": "System 2",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1980
+        },
+        {
+          "id": "2:system 3",
+          "name": "System 3",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1980
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Altos Computer Systems",
+      "models": [
+        {
+          "id": "3:1086",
+          "name": "1086",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:2086",
+          "name": "2086",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:3068",
+          "name": "3068",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:3086",
+          "name": "3086",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:486",
+          "name": "486",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:580",
+          "name": "580",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:586",
+          "name": "586",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:686",
+          "name": "686",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:886",
+          "name": "886",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:986",
+          "name": "986",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:acs 68000",
+          "name": "ACS 68000",
+          "productionYearStart": 1982,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:acs 8000",
+          "name": "ACS 8000",
+          "productionYearStart": 1979,
+          "productionYearEnd": null
+        },
+        {
+          "id": "3:acs 8600",
+          "name": "ACS 8600",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Amstrad",
+      "models": [
+        {
+          "id": "4:cpc 464",
+          "name": "CPC 464",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "4:cpc 464 plus",
+          "name": "CPC 464 Plus",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "4:cpc 6128",
+          "name": "CPC 6128",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "4:cpc 6128 plus",
+          "name": "CPC 6128 Plus",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "4:cpc 664",
+          "name": "CPC 664",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "4:mega pc",
+          "name": "Mega PC",
+          "productionYearStart": 1993,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "4:pc1512",
+          "name": "PC1512",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "4:pc1640",
+          "name": "PC1640",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "4:pcw 8256",
+          "name": "PCW 8256",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "4:pcw 8512",
+          "name": "PCW 8512",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "4:pcw 9512",
+          "name": "PCW 9512",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "4:ppc512",
+          "name": "PPC512",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "4:ppc640",
+          "name": "PPC640",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1990
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Apollo Computer",
+      "models": [
+        {
+          "id": "5:dn100",
+          "name": "DN100",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn10000",
+          "name": "DN10000",
+          "productionYearStart": 1988,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn300",
+          "name": "DN300",
+          "productionYearStart": 1982,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn3000",
+          "name": "DN3000",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn320",
+          "name": "DN320",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn330",
+          "name": "DN330",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn4000",
+          "name": "DN4000",
+          "productionYearStart": 1987,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn550",
+          "name": "DN550",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn560",
+          "name": "DN560",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "5:dn660",
+          "name": "DN660",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Apple",
+      "models": [
+        {
+          "id": "6:apple i",
+          "name": "Apple I",
+          "productionYearStart": 1976,
+          "productionYearEnd": 1977
+        },
+        {
+          "id": "6:apple ii",
+          "name": "Apple II",
+          "productionYearStart": 1977,
+          "productionYearEnd": 1981
+        },
+        {
+          "id": "6:apple ii plus",
+          "name": "Apple II Plus",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "6:apple iic",
+          "name": "Apple IIc",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "6:apple iie",
+          "name": "Apple IIe",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "6:apple iigs",
+          "name": "Apple IIgs",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "6:apple iii",
+          "name": "Apple III",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "6:ibook g3",
+          "name": "iBook G3",
+          "productionYearStart": 1999,
+          "productionYearEnd": 2001
+        },
+        {
+          "id": "6:imac g3",
+          "name": "iMac G3",
+          "productionYearStart": 1998,
+          "productionYearEnd": 2003
+        },
+        {
+          "id": "6:lisa",
+          "name": "Lisa",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "6:macbook",
+          "name": "MacBook",
+          "productionYearStart": 2006,
+          "productionYearEnd": 2010
+        },
+        {
+          "id": "6:macbook pro",
+          "name": "MacBook Pro",
+          "productionYearStart": 2006,
+          "productionYearEnd": 2010
+        },
+        {
+          "id": "6:macintosh 128k",
+          "name": "Macintosh 128K",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "6:macintosh classic",
+          "name": "Macintosh Classic",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "6:macintosh ii",
+          "name": "Macintosh II",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "6:macintosh lc",
+          "name": "Macintosh LC",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "6:macintosh plus",
+          "name": "Macintosh Plus",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "6:macintosh se",
+          "name": "Macintosh SE",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "6:power mac g4",
+          "name": "Power Mac G4",
+          "productionYearStart": 1999,
+          "productionYearEnd": 2004
+        },
+        {
+          "id": "6:power macintosh 6100",
+          "name": "Power Macintosh 6100",
+          "productionYearStart": 1994,
+          "productionYearEnd": 1995
+        },
+        {
+          "id": "6:powerbook 100",
+          "name": "PowerBook 100",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "6:powerbook 500",
+          "name": "PowerBook 500",
+          "productionYearStart": 1994,
+          "productionYearEnd": 1995
+        },
+        {
+          "id": "6:quadra 700",
+          "name": "Quadra 700",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1993
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "name": "Apricot Computers",
+      "models": [
+        {
+          "id": "7:act sirius 1",
+          "name": "ACT Sirius 1",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "7:apricot f1",
+          "name": "Apricot F1",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "7:apricot pc",
+          "name": "Apricot PC",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "7:apricot portable",
+          "name": "Apricot Portable",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "7:apricot vx ft",
+          "name": "Apricot VX FT",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "7:apricot xen-i",
+          "name": "Apricot Xen-i",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "7:apricot xi",
+          "name": "Apricot Xi",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "name": "Atari",
+      "models": [
+        {
+          "id": "8:1040st",
+          "name": "1040ST",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "8:1040ste",
+          "name": "1040STE",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "8:1040stf",
+          "name": "1040STF",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "8:1200xl",
+          "name": "1200XL",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "8:130xe",
+          "name": "130XE",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "8:260st",
+          "name": "260ST",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "8:400",
+          "name": "400",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "8:520st",
+          "name": "520ST",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "8:520st+",
+          "name": "520ST+",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "8:520ste",
+          "name": "520STE",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "8:600xl",
+          "name": "600XL",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "8:65xe",
+          "name": "65XE",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "8:800",
+          "name": "800",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "8:800xl",
+          "name": "800XL",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "8:falcon030",
+          "name": "Falcon030",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "8:mega st",
+          "name": "Mega ST",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "8:mega ste",
+          "name": "Mega STE",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "8:st book",
+          "name": "ST Book",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "8:stacy",
+          "name": "STacy",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "8:tt030",
+          "name": "TT030",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "8:xe game system",
+          "name": "XE Game System",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "name": "Bull",
+      "models": [
+        {
+          "id": "9:bull dps 6",
+          "name": "Bull DPS 6",
+          "productionYearStart": 1979,
+          "productionYearEnd": null
+        },
+        {
+          "id": "9:bull dps 7",
+          "name": "Bull DPS 7",
+          "productionYearStart": 1980,
+          "productionYearEnd": null
+        },
+        {
+          "id": "9:bull dps 7000",
+          "name": "Bull DPS 7000",
+          "productionYearStart": 1987,
+          "productionYearEnd": null
+        },
+        {
+          "id": "9:bull dps 8",
+          "name": "Bull DPS 8",
+          "productionYearStart": 1980,
+          "productionYearEnd": null
+        },
+        {
+          "id": "9:bull dps 9000",
+          "name": "Bull DPS 9000",
+          "productionYearStart": 1988,
+          "productionYearEnd": null
+        },
+        {
+          "id": "9:micral 80-22g",
+          "name": "Micral 80-22G",
+          "productionYearStart": 1980,
+          "productionYearEnd": null
+        },
+        {
+          "id": "9:micral n",
+          "name": "Micral N",
+          "productionYearStart": 1973,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "name": "Burroughs",
+      "models": [
+        {
+          "id": "10:b1700",
+          "name": "B1700",
+          "productionYearStart": 1972,
+          "productionYearEnd": null
+        },
+        {
+          "id": "10:b1800",
+          "name": "B1800",
+          "productionYearStart": 1975,
+          "productionYearEnd": null
+        },
+        {
+          "id": "10:b1900",
+          "name": "B1900",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "10:b2900",
+          "name": "B2900",
+          "productionYearStart": 1976,
+          "productionYearEnd": null
+        },
+        {
+          "id": "10:b3900",
+          "name": "B3900",
+          "productionYearStart": 1980,
+          "productionYearEnd": null
+        },
+        {
+          "id": "10:b5000",
+          "name": "B5000",
+          "productionYearStart": 1961,
+          "productionYearEnd": null
+        },
+        {
+          "id": "10:b5500",
+          "name": "B5500",
+          "productionYearStart": 1964,
+          "productionYearEnd": null
+        },
+        {
+          "id": "10:b6500",
+          "name": "B6500",
+          "productionYearStart": 1969,
+          "productionYearEnd": null
+        },
+        {
+          "id": "10:b6700",
+          "name": "B6700",
+          "productionYearStart": 1971,
+          "productionYearEnd": null
+        },
+        {
+          "id": "10:b7700",
+          "name": "B7700",
+          "productionYearStart": 1972,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "name": "Canon",
+      "models": [
+        {
+          "id": "11:as-100",
+          "name": "AS-100",
+          "productionYearStart": 1982,
+          "productionYearEnd": null
+        },
+        {
+          "id": "11:cat",
+          "name": "Cat",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "11:notejet 486",
+          "name": "NoteJet 486",
+          "productionYearStart": 1993,
+          "productionYearEnd": null
+        },
+        {
+          "id": "11:v-20",
+          "name": "V-20",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "11:x-07",
+          "name": "X-07",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "name": "Commodore",
+      "models": [
+        {
+          "id": "12:128",
+          "name": "128",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "12:128d",
+          "name": "128D",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "12:128dcr",
+          "name": "128DCR",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "12:65",
+          "name": "65",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "12:amiga 1000",
+          "name": "Amiga 1000",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "12:amiga 1200",
+          "name": "Amiga 1200",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "12:amiga 2000",
+          "name": "Amiga 2000",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "12:amiga 2500",
+          "name": "Amiga 2500",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "12:amiga 3000",
+          "name": "Amiga 3000",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "12:amiga 3000t",
+          "name": "Amiga 3000T",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "12:amiga 4000",
+          "name": "Amiga 4000",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "12:amiga 4000t",
+          "name": "Amiga 4000T",
+          "productionYearStart": 1994,
+          "productionYearEnd": 1995
+        },
+        {
+          "id": "12:amiga 500",
+          "name": "Amiga 500",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "12:amiga 500+",
+          "name": "Amiga 500+",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "12:amiga 600",
+          "name": "Amiga 600",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "12:amiga cd32",
+          "name": "Amiga CD32",
+          "productionYearStart": 1993,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "12:cbm 8032-sk",
+          "name": "CBM 8032-SK",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "12:cbm 8096",
+          "name": "CBM 8096",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "12:cdtv",
+          "name": "CDTV",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "12:commodore 16",
+          "name": "Commodore 16",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "12:commodore 64",
+          "name": "Commodore 64",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "12:commodore 64c",
+          "name": "Commodore 64C",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "12:max machine",
+          "name": "MAX Machine",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "12:pet 2001",
+          "name": "PET 2001",
+          "productionYearStart": 1977,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "12:pet 2001-16",
+          "name": "PET 2001-16",
+          "productionYearStart": 1978,
+          "productionYearEnd": 1979
+        },
+        {
+          "id": "12:pet 2001-32",
+          "name": "PET 2001-32",
+          "productionYearStart": 1978,
+          "productionYearEnd": 1980
+        },
+        {
+          "id": "12:pet 2001-8",
+          "name": "PET 2001-8",
+          "productionYearStart": 1977,
+          "productionYearEnd": 1979
+        },
+        {
+          "id": "12:pet 3008",
+          "name": "PET 3008",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1980
+        },
+        {
+          "id": "12:pet 3016",
+          "name": "PET 3016",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1980
+        },
+        {
+          "id": "12:pet 3032",
+          "name": "PET 3032",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1981
+        },
+        {
+          "id": "12:pet 4016",
+          "name": "PET 4016",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "12:pet 4032",
+          "name": "PET 4032",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "12:pet 8032",
+          "name": "PET 8032",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "12:plus/4",
+          "name": "Plus/4",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "12:superpet sp9000",
+          "name": "SuperPET SP9000",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "12:sx-64",
+          "name": "SX-64",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "12:vic-1001",
+          "name": "VIC-1001",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1981
+        },
+        {
+          "id": "12:vic-20",
+          "name": "VIC-20",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1985
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "name": "Compaq",
+      "models": [
+        {
+          "id": "13:armada",
+          "name": "Armada",
+          "productionYearStart": 1996,
+          "productionYearEnd": 2002
+        },
+        {
+          "id": "13:deskpro 286",
+          "name": "Deskpro 286",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "13:deskpro 386",
+          "name": "Deskpro 386",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "13:lte 286",
+          "name": "LTE 286",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "13:lte lite",
+          "name": "LTE Lite",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "13:portable",
+          "name": "Portable",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "13:portable 386",
+          "name": "Portable 386",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "13:portable ii",
+          "name": "Portable II",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "13:portable iii",
+          "name": "Portable III",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "13:portable plus",
+          "name": "Portable Plus",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "13:presario 425",
+          "name": "Presario 425",
+          "productionYearStart": 1993,
+          "productionYearEnd": 1995
+        },
+        {
+          "id": "13:prolinea",
+          "name": "ProLinea",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1996
+        },
+        {
+          "id": "13:prosignia",
+          "name": "ProSignia",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1996
+        },
+        {
+          "id": "13:slt/286",
+          "name": "SLT/286",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1990
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "name": "Control Data",
+      "models": [
+        {
+          "id": "14:cdc 1604",
+          "name": "CDC 1604",
+          "productionYearStart": 1960,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc 160a",
+          "name": "CDC 160A",
+          "productionYearStart": 1960,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc 3600",
+          "name": "CDC 3600",
+          "productionYearStart": 1963,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc 6400",
+          "name": "CDC 6400",
+          "productionYearStart": 1966,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc 6500",
+          "name": "CDC 6500",
+          "productionYearStart": 1967,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc 6600",
+          "name": "CDC 6600",
+          "productionYearStart": 1964,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc 7600",
+          "name": "CDC 7600",
+          "productionYearStart": 1967,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc cyber 170",
+          "name": "CDC Cyber 170",
+          "productionYearStart": 1975,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc cyber 180",
+          "name": "CDC Cyber 180",
+          "productionYearStart": 1982,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc cyber 205",
+          "name": "CDC Cyber 205",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc cyber 70",
+          "name": "CDC Cyber 70",
+          "productionYearStart": 1971,
+          "productionYearEnd": null
+        },
+        {
+          "id": "14:cdc star-100",
+          "name": "CDC STAR-100",
+          "productionYearStart": 1974,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "name": "Cray Research",
+      "models": [
+        {
+          "id": "15:cray c90",
+          "name": "Cray C90",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1996
+        },
+        {
+          "id": "15:cray j90",
+          "name": "Cray J90",
+          "productionYearStart": 1994,
+          "productionYearEnd": 1998
+        },
+        {
+          "id": "15:cray t3d",
+          "name": "Cray T3D",
+          "productionYearStart": 1993,
+          "productionYearEnd": 1995
+        },
+        {
+          "id": "15:cray t3e",
+          "name": "Cray T3E",
+          "productionYearStart": 1995,
+          "productionYearEnd": 2002
+        },
+        {
+          "id": "15:cray x-mp",
+          "name": "Cray X-MP",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "15:cray y-mp",
+          "name": "Cray Y-MP",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1995
+        },
+        {
+          "id": "15:cray-1",
+          "name": "Cray-1",
+          "productionYearStart": 1976,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "15:cray-2",
+          "name": "Cray-2",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1990
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "name": "Data General",
+      "models": [
+        {
+          "id": "16:aviion",
+          "name": "AViiON",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1999
+        },
+        {
+          "id": "16:data general/one",
+          "name": "Data General/One",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "16:eclipse c/330",
+          "name": "Eclipse C/330",
+          "productionYearStart": 1977,
+          "productionYearEnd": null
+        },
+        {
+          "id": "16:eclipse mv/10000",
+          "name": "Eclipse MV/10000",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "16:eclipse mv/4000",
+          "name": "Eclipse MV/4000",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        },
+        {
+          "id": "16:eclipse s/200",
+          "name": "Eclipse S/200",
+          "productionYearStart": 1974,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "16:mv/8000",
+          "name": "MV/8000",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "16:nova",
+          "name": "Nova",
+          "productionYearStart": 1969,
+          "productionYearEnd": 1978
+        },
+        {
+          "id": "16:nova 1200",
+          "name": "Nova 1200",
+          "productionYearStart": 1970,
+          "productionYearEnd": 1978
+        },
+        {
+          "id": "16:nova 3",
+          "name": "Nova 3",
+          "productionYearStart": 1975,
+          "productionYearEnd": null
+        },
+        {
+          "id": "16:nova 4",
+          "name": "Nova 4",
+          "productionYearStart": 1978,
+          "productionYearEnd": null
+        },
+        {
+          "id": "16:supernova",
+          "name": "SuperNOVA",
+          "productionYearStart": 1969,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "name": "Dell",
+      "models": [
+        {
+          "id": "17:316lt",
+          "name": "316LT",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "17:dimension 4100",
+          "name": "Dimension 4100",
+          "productionYearStart": 2000,
+          "productionYearEnd": 2001
+        },
+        {
+          "id": "17:dimension xps",
+          "name": "Dimension XPS",
+          "productionYearStart": 1993,
+          "productionYearEnd": 2001
+        },
+        {
+          "id": "17:inspiron 3000",
+          "name": "Inspiron 3000",
+          "productionYearStart": 1997,
+          "productionYearEnd": 1999
+        },
+        {
+          "id": "17:latitude xpi",
+          "name": "Latitude XPi",
+          "productionYearStart": 1997,
+          "productionYearEnd": 2000
+        },
+        {
+          "id": "17:optiplex gx1",
+          "name": "OptiPlex GX1",
+          "productionYearStart": 1998,
+          "productionYearEnd": 2000
+        },
+        {
+          "id": "17:poweredge 2300",
+          "name": "PowerEdge 2300",
+          "productionYearStart": 1997,
+          "productionYearEnd": 1999
+        },
+        {
+          "id": "17:poweredge 2450",
+          "name": "PowerEdge 2450",
+          "productionYearStart": 1999,
+          "productionYearEnd": 2001
+        },
+        {
+          "id": "17:system 200",
+          "name": "System 200",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "17:turbo pc",
+          "name": "Turbo PC",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "name": "Digital Equipment Corporation",
+      "models": [
+        {
+          "id": "18:alphaserver 2100",
+          "name": "AlphaServer 2100",
+          "productionYearStart": 1994,
+          "productionYearEnd": 1998
+        },
+        {
+          "id": "18:alphastation 200",
+          "name": "AlphaStation 200",
+          "productionYearStart": 1994,
+          "productionYearEnd": 1996
+        },
+        {
+          "id": "18:dec 3000 axp",
+          "name": "DEC 3000 AXP",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1995
+        },
+        {
+          "id": "18:decpc axp 150",
+          "name": "DECpc AXP 150",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "18:decstation 3100",
+          "name": "DECstation 3100",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "18:decsystem-20",
+          "name": "DECsystem-20",
+          "productionYearStart": 1976,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "18:microvax ii",
+          "name": "MicroVAX II",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "18:pdp-1",
+          "name": "PDP-1",
+          "productionYearStart": 1960,
+          "productionYearEnd": 1969
+        },
+        {
+          "id": "18:pdp-10",
+          "name": "PDP-10",
+          "productionYearStart": 1966,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "18:pdp-11/20",
+          "name": "PDP-11/20",
+          "productionYearStart": 1970,
+          "productionYearEnd": 1975
+        },
+        {
+          "id": "18:pdp-11/70",
+          "name": "PDP-11/70",
+          "productionYearStart": 1975,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "18:pdp-6",
+          "name": "PDP-6",
+          "productionYearStart": 1964,
+          "productionYearEnd": 1969
+        },
+        {
+          "id": "18:pdp-8",
+          "name": "PDP-8",
+          "productionYearStart": 1965,
+          "productionYearEnd": 1979
+        },
+        {
+          "id": "18:pdp-8/e",
+          "name": "PDP-8/e",
+          "productionYearStart": 1970,
+          "productionYearEnd": 1978
+        },
+        {
+          "id": "18:vax-11/750",
+          "name": "VAX-11/750",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "18:vax-11/780",
+          "name": "VAX-11/780",
+          "productionYearStart": 1977,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "18:vaxstation 2000",
+          "name": "VAXstation 2000",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "name": "Epson",
+      "models": [
+        {
+          "id": "19:actionnote 4slc/25",
+          "name": "ActionNote 4SLC/25",
+          "productionYearStart": 1993,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "19:endeavor",
+          "name": "Endeavor",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "19:equity i",
+          "name": "Equity I",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "19:equity ii",
+          "name": "Equity II",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "19:equity iii",
+          "name": "Equity III",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "19:hx-20",
+          "name": "HX-20",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "19:pc-286",
+          "name": "PC-286",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "19:pc-386",
+          "name": "PC-386",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "19:pc-486",
+          "name": "PC-486",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "19:px-8 geneva",
+          "name": "PX-8 Geneva",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "19:qx-10",
+          "name": "QX-10",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        }
+      ]
+    },
+    {
+      "id": "20",
+      "name": "Fujitsu",
+      "models": [
+        {
+          "id": "20:facom 100",
+          "name": "FACOM 100",
+          "productionYearStart": 1954,
+          "productionYearEnd": null
+        },
+        {
+          "id": "20:facom 128b",
+          "name": "FACOM 128B",
+          "productionYearStart": 1958,
+          "productionYearEnd": null
+        },
+        {
+          "id": "20:facom 230",
+          "name": "FACOM 230",
+          "productionYearStart": 1964,
+          "productionYearEnd": null
+        },
+        {
+          "id": "20:facom m-190",
+          "name": "FACOM M-190",
+          "productionYearStart": 1975,
+          "productionYearEnd": null
+        },
+        {
+          "id": "20:fm r",
+          "name": "FM R",
+          "productionYearStart": 1987,
+          "productionYearEnd": null
+        },
+        {
+          "id": "20:fm towns",
+          "name": "FM Towns",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "20:fm-7",
+          "name": "FM-7",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "20:fm-77",
+          "name": "FM-77",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "20:fm-8",
+          "name": "FM-8",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "20:fmv",
+          "name": "FMV",
+          "productionYearStart": 1993,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "21",
+      "name": "Hewlett-Packard",
+      "models": [
+        {
+          "id": "21:hp 150",
+          "name": "HP 150",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "21:hp 200lx",
+          "name": "HP 200LX",
+          "productionYearStart": 1994,
+          "productionYearEnd": 1999
+        },
+        {
+          "id": "21:hp 2116a",
+          "name": "HP 2116A",
+          "productionYearStart": 1966,
+          "productionYearEnd": null
+        },
+        {
+          "id": "21:hp 3000",
+          "name": "HP 3000",
+          "productionYearStart": 1972,
+          "productionYearEnd": 2003
+        },
+        {
+          "id": "21:hp 85",
+          "name": "HP 85",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "21:hp 86",
+          "name": "HP 86",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "21:hp 9000/300",
+          "name": "HP 9000/300",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "21:hp 9000/700",
+          "name": "HP 9000/700",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "21:hp 95lx",
+          "name": "HP 95LX",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "21:hp 9830a",
+          "name": "HP 9830A",
+          "productionYearStart": 1972,
+          "productionYearEnd": null
+        },
+        {
+          "id": "21:hp 9845",
+          "name": "HP 9845",
+          "productionYearStart": 1977,
+          "productionYearEnd": null
+        },
+        {
+          "id": "21:hp jornada 680",
+          "name": "HP Jornada 680",
+          "productionYearStart": 1998,
+          "productionYearEnd": 2000
+        },
+        {
+          "id": "21:hp vectra",
+          "name": "HP Vectra",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1995
+        }
+      ]
+    },
+    {
+      "id": "22",
+      "name": "Honeywell",
+      "models": [
+        {
+          "id": "22:honeywell 200",
+          "name": "Honeywell 200",
+          "productionYearStart": 1963,
+          "productionYearEnd": null
+        },
+        {
+          "id": "22:honeywell 316",
+          "name": "Honeywell 316",
+          "productionYearStart": 1969,
+          "productionYearEnd": null
+        },
+        {
+          "id": "22:honeywell 516",
+          "name": "Honeywell 516",
+          "productionYearStart": 1966,
+          "productionYearEnd": null
+        },
+        {
+          "id": "22:honeywell dps 6",
+          "name": "Honeywell DPS 6",
+          "productionYearStart": 1979,
+          "productionYearEnd": null
+        },
+        {
+          "id": "22:honeywell dps 6 plus",
+          "name": "Honeywell DPS 6 Plus",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "22:honeywell dps 8",
+          "name": "Honeywell DPS 8",
+          "productionYearStart": 1979,
+          "productionYearEnd": null
+        },
+        {
+          "id": "22:honeywell level 6",
+          "name": "Honeywell Level 6",
+          "productionYearStart": 1975,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "name": "IBM",
+      "models": [
+        {
+          "id": "1:1401",
+          "name": "1401",
+          "productionYearStart": 1959,
+          "productionYearEnd": 1971
+        },
+        {
+          "id": "1:5100",
+          "name": "5100",
+          "productionYearStart": 1975,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "1:5110",
+          "name": "5110",
+          "productionYearStart": 1978,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "1:5150",
+          "name": "5150",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "1:5160",
+          "name": "5160",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "1:5170",
+          "name": "5170",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "1:701",
+          "name": "701",
+          "productionYearStart": 1952,
+          "productionYearEnd": 1956
+        },
+        {
+          "id": "1:704",
+          "name": "704",
+          "productionYearStart": 1954,
+          "productionYearEnd": 1960
+        },
+        {
+          "id": "1:7090",
+          "name": "7090",
+          "productionYearStart": 1959,
+          "productionYearEnd": 1965
+        },
+        {
+          "id": "1:aptiva",
+          "name": "Aptiva",
+          "productionYearStart": 1994,
+          "productionYearEnd": 2001
+        },
+        {
+          "id": "1:as/400",
+          "name": "AS/400",
+          "productionYearStart": 1988,
+          "productionYearEnd": 2000
+        },
+        {
+          "id": "1:netvista",
+          "name": "NetVista",
+          "productionYearStart": 2000,
+          "productionYearEnd": 2004
+        },
+        {
+          "id": "1:pc convertible",
+          "name": "PC Convertible",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "1:pcjr",
+          "name": "PCjr",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "1:portable pc",
+          "name": "Portable PC",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "1:ps/1",
+          "name": "PS/1",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "1:ps/2 model 30",
+          "name": "PS/2 Model 30",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "1:ps/2 model 55 sx",
+          "name": "PS/2 Model 55 SX",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "1:rs/6000",
+          "name": "RS/6000",
+          "productionYearStart": 1990,
+          "productionYearEnd": 2000
+        },
+        {
+          "id": "1:system/3",
+          "name": "System/3",
+          "productionYearStart": 1969,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "1:system/32",
+          "name": "System/32",
+          "productionYearStart": 1975,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "1:system/360 model 30",
+          "name": "System/360 Model 30",
+          "productionYearStart": 1965,
+          "productionYearEnd": 1975
+        },
+        {
+          "id": "1:system/360 model 50",
+          "name": "System/360 Model 50",
+          "productionYearStart": 1965,
+          "productionYearEnd": 1977
+        },
+        {
+          "id": "1:system/370 model 145",
+          "name": "System/370 Model 145",
+          "productionYearStart": 1970,
+          "productionYearEnd": 1980
+        },
+        {
+          "id": "1:system/370 model 158",
+          "name": "System/370 Model 158",
+          "productionYearStart": 1972,
+          "productionYearEnd": 1980
+        },
+        {
+          "id": "1:thinkcentre a50",
+          "name": "ThinkCentre A50",
+          "productionYearStart": 2003,
+          "productionYearEnd": 2005
+        },
+        {
+          "id": "1:thinkpad 700c",
+          "name": "ThinkPad 700C",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "1:thinkpad 760",
+          "name": "ThinkPad 760",
+          "productionYearStart": 1995,
+          "productionYearEnd": 1997
+        }
+      ]
+    },
+    {
+      "id": "23",
+      "name": "ICL",
+      "models": [
+        {
+          "id": "23:1900 series",
+          "name": "1900 Series",
+          "productionYearStart": 1964,
+          "productionYearEnd": 1974
+        },
+        {
+          "id": "23:2900 series",
+          "name": "2900 Series",
+          "productionYearStart": 1974,
+          "productionYearEnd": null
+        },
+        {
+          "id": "23:drs 20",
+          "name": "DRS 20",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        },
+        {
+          "id": "23:drs 300",
+          "name": "DRS 300",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "23:drs 6000",
+          "name": "DRS 6000",
+          "productionYearStart": 1988,
+          "productionYearEnd": null
+        },
+        {
+          "id": "23:me29",
+          "name": "ME29",
+          "productionYearStart": 1980,
+          "productionYearEnd": null
+        },
+        {
+          "id": "23:one per desk",
+          "name": "One Per Desk",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "23:system 4",
+          "name": "System 4",
+          "productionYearStart": 1965,
+          "productionYearEnd": 1975
+        }
+      ]
+    },
+    {
+      "id": "24",
+      "name": "Intel",
+      "models": [
+        {
+          "id": "24:intellec 4",
+          "name": "Intellec 4",
+          "productionYearStart": 1973,
+          "productionYearEnd": null
+        },
+        {
+          "id": "24:intellec 8",
+          "name": "Intellec 8",
+          "productionYearStart": 1973,
+          "productionYearEnd": null
+        },
+        {
+          "id": "24:intellec mds",
+          "name": "Intellec MDS",
+          "productionYearStart": 1975,
+          "productionYearEnd": null
+        },
+        {
+          "id": "24:ipsc/1",
+          "name": "iPSC/1",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "24:ipsc/2",
+          "name": "iPSC/2",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "24:isbc 80/10",
+          "name": "iSBC 80/10",
+          "productionYearStart": 1976,
+          "productionYearEnd": null
+        },
+        {
+          "id": "24:paragon xp/s",
+          "name": "Paragon XP/S",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1995
+        },
+        {
+          "id": "24:touchstone delta",
+          "name": "Touchstone Delta",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1992
+        }
+      ]
+    },
+    {
+      "id": "25",
+      "name": "Kaypro",
+      "models": [
+        {
+          "id": "25:1",
+          "name": "1",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "25:10",
+          "name": "10",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "25:16",
+          "name": "16",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "25:2000",
+          "name": "2000",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "25:2x",
+          "name": "2X",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "25:4",
+          "name": "4",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "25:ii",
+          "name": "II",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "25:robie",
+          "name": "Robie",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1984
+        }
+      ]
+    },
+    {
+      "id": "26",
+      "name": "Leading Edge",
+      "models": [
+        {
+          "id": "26:model d",
+          "name": "Model D",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "26:model d2",
+          "name": "Model D2",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "26:model d3",
+          "name": "Model D3",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "26:model m",
+          "name": "Model M",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1988
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "name": "Lenovo",
+      "models": [
+        {
+          "id": "27:3000",
+          "name": "3000",
+          "productionYearStart": 2006,
+          "productionYearEnd": 2008
+        },
+        {
+          "id": "27:ideacentre k210",
+          "name": "IdeaCentre K210",
+          "productionYearStart": 2008,
+          "productionYearEnd": 2010
+        },
+        {
+          "id": "27:ideapad y710",
+          "name": "IdeaPad Y710",
+          "productionYearStart": 2008,
+          "productionYearEnd": 2009
+        },
+        {
+          "id": "27:thinkpad x1 carbon",
+          "name": "ThinkPad X1 Carbon",
+          "productionYearStart": 2012,
+          "productionYearEnd": null
+        },
+        {
+          "id": "27:thinkpad x300",
+          "name": "ThinkPad X300",
+          "productionYearStart": 2008,
+          "productionYearEnd": 2009
+        },
+        {
+          "id": "27:thinkstation s10",
+          "name": "ThinkStation S10",
+          "productionYearStart": 2008,
+          "productionYearEnd": 2010
+        },
+        {
+          "id": "27:yoga 13",
+          "name": "Yoga 13",
+          "productionYearStart": 2012,
+          "productionYearEnd": 2014
+        }
+      ]
+    },
+    {
+      "id": "28",
+      "name": "MITS",
+      "models": [
+        {
+          "id": "28:altair 680",
+          "name": "Altair 680",
+          "productionYearStart": 1976,
+          "productionYearEnd": 1977
+        },
+        {
+          "id": "28:altair 8800",
+          "name": "Altair 8800",
+          "productionYearStart": 1975,
+          "productionYearEnd": 1978
+        },
+        {
+          "id": "28:altair 8800b",
+          "name": "Altair 8800b",
+          "productionYearStart": 1976,
+          "productionYearEnd": 1978
+        }
+      ]
+    },
+    {
+      "id": "30",
+      "name": "NCR",
+      "models": [
+        {
+          "id": "30:century 100",
+          "name": "Century 100",
+          "productionYearStart": 1968,
+          "productionYearEnd": null
+        },
+        {
+          "id": "30:century 200",
+          "name": "Century 200",
+          "productionYearStart": 1968,
+          "productionYearEnd": null
+        },
+        {
+          "id": "30:criterion 8550",
+          "name": "Criterion 8550",
+          "productionYearStart": 1977,
+          "productionYearEnd": null
+        },
+        {
+          "id": "30:criterion 9800",
+          "name": "Criterion 9800",
+          "productionYearStart": 1988,
+          "productionYearEnd": null
+        },
+        {
+          "id": "30:system 3000",
+          "name": "System 3000",
+          "productionYearStart": 1990,
+          "productionYearEnd": null
+        },
+        {
+          "id": "30:tower 1632",
+          "name": "Tower 1632",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "30:tower 32",
+          "name": "Tower 32",
+          "productionYearStart": 1982,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "29",
+      "name": "NEC",
+      "models": [
+        {
+          "id": "29:apc",
+          "name": "APC",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "29:apc iii",
+          "name": "APC III",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "29:pc-100",
+          "name": "PC-100",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "29:pc-6001",
+          "name": "PC-6001",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "29:pc-6601",
+          "name": "PC-6601",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "29:pc-8001",
+          "name": "PC-8001",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "29:pc-8801",
+          "name": "PC-8801",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "29:pc-9801",
+          "name": "PC-9801",
+          "productionYearStart": 1982,
+          "productionYearEnd": 2003
+        },
+        {
+          "id": "29:pc-9801ra",
+          "name": "PC-9801RA",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "29:pc-9801vm",
+          "name": "PC-9801VM",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "29:pc-9801vx",
+          "name": "PC-9801VX",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "29:pc-9821",
+          "name": "PC-9821",
+          "productionYearStart": 1992,
+          "productionYearEnd": 2003
+        }
+      ]
+    },
+    {
+      "id": "31",
+      "name": "NeXT",
+      "models": [
+        {
+          "id": "31:next computer",
+          "name": "NeXT Computer",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "31:nextcube",
+          "name": "NeXTcube",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "31:nextcube turbo",
+          "name": "NeXTcube Turbo",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "31:nextstation",
+          "name": "NeXTstation",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "31:nextstation color",
+          "name": "NeXTstation Color",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1993
+        }
+      ]
+    },
+    {
+      "id": "32",
+      "name": "Olivetti",
+      "models": [
+        {
+          "id": "32:m20",
+          "name": "M20",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "32:m24",
+          "name": "M24",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "32:m240",
+          "name": "M240",
+          "productionYearStart": 1987,
+          "productionYearEnd": null
+        },
+        {
+          "id": "32:m28",
+          "name": "M28",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "32:m290",
+          "name": "M290",
+          "productionYearStart": 1988,
+          "productionYearEnd": null
+        },
+        {
+          "id": "32:p6060",
+          "name": "P6060",
+          "productionYearStart": 1975,
+          "productionYearEnd": null
+        },
+        {
+          "id": "32:programma 101",
+          "name": "Programma 101",
+          "productionYearStart": 1965,
+          "productionYearEnd": 1971
+        }
+      ]
+    },
+    {
+      "id": "33",
+      "name": "Osborne Computer Corporation",
+      "models": [
+        {
+          "id": "33:executive",
+          "name": "Executive",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "33:osborne 1",
+          "name": "Osborne 1",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "33:vixen",
+          "name": "Vixen",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1985
+        }
+      ]
+    },
+    {
+      "id": "34",
+      "name": "Packard Bell",
+      "models": [
+        {
+          "id": "34:force",
+          "name": "Force",
+          "productionYearStart": 1994,
+          "productionYearEnd": null
+        },
+        {
+          "id": "34:legend",
+          "name": "Legend",
+          "productionYearStart": 1992,
+          "productionYearEnd": null
+        },
+        {
+          "id": "34:legend 386sx",
+          "name": "Legend 386SX",
+          "productionYearStart": 1991,
+          "productionYearEnd": null
+        },
+        {
+          "id": "34:legend 486",
+          "name": "Legend 486",
+          "productionYearStart": 1992,
+          "productionYearEnd": null
+        },
+        {
+          "id": "34:multimedia",
+          "name": "Multimedia",
+          "productionYearStart": 1994,
+          "productionYearEnd": null
+        },
+        {
+          "id": "34:pb286lp",
+          "name": "PB286LP",
+          "productionYearStart": 1990,
+          "productionYearEnd": null
+        },
+        {
+          "id": "34:statesman",
+          "name": "Statesman",
+          "productionYearStart": 1993,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "35",
+      "name": "Panasonic",
+      "models": [
+        {
+          "id": "35:executive partner",
+          "name": "Executive Partner",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "35:hhc",
+          "name": "HHC",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        },
+        {
+          "id": "35:jr-100",
+          "name": "JR-100",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        },
+        {
+          "id": "35:jr-200",
+          "name": "JR-200",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "35:jr-300",
+          "name": "JR-300",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "35:senior partner",
+          "name": "Senior Partner",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1985
+        }
+      ]
+    },
+    {
+      "id": "36",
+      "name": "Prime Computer",
+      "models": [
+        {
+          "id": "36:prime 100",
+          "name": "Prime 100",
+          "productionYearStart": 1973,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 200",
+          "name": "Prime 200",
+          "productionYearStart": 1972,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 2250",
+          "name": "Prime 2250",
+          "productionYearStart": 1982,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 2550",
+          "name": "Prime 2550",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 300",
+          "name": "Prime 300",
+          "productionYearStart": 1974,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 400",
+          "name": "Prime 400",
+          "productionYearStart": 1976,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 6550",
+          "name": "Prime 6550",
+          "productionYearStart": 1987,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 750",
+          "name": "Prime 750",
+          "productionYearStart": 1979,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 850",
+          "name": "Prime 850",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 9950",
+          "name": "Prime 9950",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "36:prime 9955",
+          "name": "Prime 9955",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "37",
+      "name": "Samsung",
+      "models": [
+        {
+          "id": "37:sens 500",
+          "name": "SENS 500",
+          "productionYearStart": 1995,
+          "productionYearEnd": null
+        },
+        {
+          "id": "37:spc-1000",
+          "name": "SPC-1000",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "37:spc-1500",
+          "name": "SPC-1500",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "37:spc-3000v",
+          "name": "SPC-3000V",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "38",
+      "name": "Sharp",
+      "models": [
+        {
+          "id": "38:mz-1500",
+          "name": "MZ-1500",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "38:mz-2500",
+          "name": "MZ-2500",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "38:mz-700",
+          "name": "MZ-700",
+          "productionYearStart": 1982,
+          "productionYearEnd": null
+        },
+        {
+          "id": "38:mz-80b",
+          "name": "MZ-80B",
+          "productionYearStart": 1981,
+          "productionYearEnd": null
+        },
+        {
+          "id": "38:mz-80k",
+          "name": "MZ-80K",
+          "productionYearStart": 1978,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "38:x1",
+          "name": "X1",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "38:x1 turbo",
+          "name": "X1 Turbo",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "38:x1 turbo z",
+          "name": "X1 Turbo Z",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "38:x68000",
+          "name": "X68000",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1993
+        }
+      ]
+    },
+    {
+      "id": "39",
+      "name": "Silicon Graphics",
+      "models": [
+        {
+          "id": "39:crimson",
+          "name": "Crimson",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "39:indigo",
+          "name": "Indigo",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "39:indigo2",
+          "name": "Indigo2",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "39:indy",
+          "name": "Indy",
+          "productionYearStart": 1993,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "39:iris 1000",
+          "name": "IRIS 1000",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "39:iris 2000",
+          "name": "IRIS 2000",
+          "productionYearStart": 1985,
+          "productionYearEnd": null
+        },
+        {
+          "id": "39:iris 3000",
+          "name": "IRIS 3000",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "39:iris 4d",
+          "name": "IRIS 4D",
+          "productionYearStart": 1987,
+          "productionYearEnd": null
+        },
+        {
+          "id": "39:o2",
+          "name": "O2",
+          "productionYearStart": 1996,
+          "productionYearEnd": 2000
+        },
+        {
+          "id": "39:octane",
+          "name": "Octane",
+          "productionYearStart": 1997,
+          "productionYearEnd": 2004
+        },
+        {
+          "id": "39:onyx",
+          "name": "Onyx",
+          "productionYearStart": 1993,
+          "productionYearEnd": 1996
+        },
+        {
+          "id": "39:origin 2000",
+          "name": "Origin 2000",
+          "productionYearStart": 1996,
+          "productionYearEnd": 2002
+        },
+        {
+          "id": "39:personal iris",
+          "name": "Personal IRIS",
+          "productionYearStart": 1988,
+          "productionYearEnd": null
+        },
+        {
+          "id": "39:tezro",
+          "name": "Tezro",
+          "productionYearStart": 2003,
+          "productionYearEnd": 2006
+        }
+      ]
+    },
+    {
+      "id": "40",
+      "name": "Sinclair Research",
+      "models": [
+        {
+          "id": "40:ql",
+          "name": "QL",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "40:zx spectrum +2",
+          "name": "ZX Spectrum +2",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "40:zx spectrum +3",
+          "name": "ZX Spectrum +3",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "40:zx spectrum 128",
+          "name": "ZX Spectrum 128",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "40:zx spectrum 48k",
+          "name": "ZX Spectrum 48K",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "40:zx spectrum+",
+          "name": "ZX Spectrum+",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "40:zx80",
+          "name": "ZX80",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1981
+        },
+        {
+          "id": "40:zx81",
+          "name": "ZX81",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1984
+        }
+      ]
+    },
+    {
+      "id": "41",
+      "name": "Sony",
+      "models": [
+        {
+          "id": "41:hitbit hb-75",
+          "name": "HitBit HB-75",
+          "productionYearStart": 1984,
+          "productionYearEnd": null
+        },
+        {
+          "id": "41:hitbit hb-f1",
+          "name": "HitBit HB-F1",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "41:news nws-800",
+          "name": "NEWS NWS-800",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1998
+        },
+        {
+          "id": "41:smc-70",
+          "name": "SMC-70",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "41:smc-70g",
+          "name": "SMC-70G",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "41:vaio pcg-505",
+          "name": "VAIO PCG-505",
+          "productionYearStart": 1997,
+          "productionYearEnd": 2004
+        },
+        {
+          "id": "41:vaio pcv",
+          "name": "VAIO PCV",
+          "productionYearStart": 1996,
+          "productionYearEnd": 2005
+        }
+      ]
+    },
+    {
+      "id": "42",
+      "name": "Sun Microsystems",
+      "models": [
+        {
+          "id": "42:sparcstation 1",
+          "name": "SPARCstation 1",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1992
+        },
+        {
+          "id": "42:sparcstation 10",
+          "name": "SPARCstation 10",
+          "productionYearStart": 1992,
+          "productionYearEnd": 1994
+        },
+        {
+          "id": "42:sparcstation 20",
+          "name": "SPARCstation 20",
+          "productionYearStart": 1994,
+          "productionYearEnd": 1996
+        },
+        {
+          "id": "42:sun blade 100",
+          "name": "Sun Blade 100",
+          "productionYearStart": 2000,
+          "productionYearEnd": 2002
+        },
+        {
+          "id": "42:sun enterprise 10000",
+          "name": "Sun Enterprise 10000",
+          "productionYearStart": 1997,
+          "productionYearEnd": 2002
+        },
+        {
+          "id": "42:sun fire v100",
+          "name": "Sun Fire V100",
+          "productionYearStart": 2000,
+          "productionYearEnd": 2003
+        },
+        {
+          "id": "42:sun-1",
+          "name": "Sun-1",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "42:sun-2",
+          "name": "Sun-2",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "42:sun-3",
+          "name": "Sun-3",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "42:sun-4",
+          "name": "Sun-4",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "42:ultra 1",
+          "name": "Ultra 1",
+          "productionYearStart": 1995,
+          "productionYearEnd": 1998
+        },
+        {
+          "id": "42:ultra 10",
+          "name": "Ultra 10",
+          "productionYearStart": 1997,
+          "productionYearEnd": 2002
+        },
+        {
+          "id": "42:ultra 2",
+          "name": "Ultra 2",
+          "productionYearStart": 1995,
+          "productionYearEnd": 1998
+        },
+        {
+          "id": "42:ultra 5",
+          "name": "Ultra 5",
+          "productionYearStart": 1997,
+          "productionYearEnd": 2002
+        }
+      ]
+    },
+    {
+      "id": "43",
+      "name": "Tandem Computers",
+      "models": [
+        {
+          "id": "43:cyclone/r",
+          "name": "Cyclone/R",
+          "productionYearStart": 1991,
+          "productionYearEnd": 1993
+        },
+        {
+          "id": "43:nonstop clx",
+          "name": "NonStop CLX",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "43:nonstop cyclone",
+          "name": "NonStop Cyclone",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "43:nonstop himalaya k-series",
+          "name": "NonStop Himalaya K-Series",
+          "productionYearStart": 1993,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "43:nonstop himalaya s-series",
+          "name": "NonStop Himalaya S-Series",
+          "productionYearStart": 1997,
+          "productionYearEnd": 2005
+        },
+        {
+          "id": "43:nonstop i",
+          "name": "NonStop I",
+          "productionYearStart": 1976,
+          "productionYearEnd": 1981
+        },
+        {
+          "id": "43:nonstop ii",
+          "name": "NonStop II",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1983
+        },
+        {
+          "id": "43:nonstop txp",
+          "name": "NonStop TXP",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        }
+      ]
+    },
+    {
+      "id": "44",
+      "name": "Tandy",
+      "models": [
+        {
+          "id": "44:1000",
+          "name": "1000",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "44:1000 ex",
+          "name": "1000 EX",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "44:1000 hx",
+          "name": "1000 HX",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "44:1000 rl",
+          "name": "1000 RL",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "44:1000 sx",
+          "name": "1000 SX",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "44:model 100",
+          "name": "Model 100",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "44:model 200",
+          "name": "Model 200",
+          "productionYearStart": 1984,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "44:trs-80 color computer",
+          "name": "TRS-80 Color Computer",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "44:trs-80 color computer 2",
+          "name": "TRS-80 Color Computer 2",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "44:trs-80 color computer 3",
+          "name": "TRS-80 Color Computer 3",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "44:trs-80 model 4",
+          "name": "TRS-80 Model 4",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "44:trs-80 model i",
+          "name": "TRS-80 Model I",
+          "productionYearStart": 1977,
+          "productionYearEnd": 1981
+        },
+        {
+          "id": "44:trs-80 model ii",
+          "name": "TRS-80 Model II",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "44:trs-80 model iii",
+          "name": "TRS-80 Model III",
+          "productionYearStart": 1980,
+          "productionYearEnd": 1983
+        }
+      ]
+    },
+    {
+      "id": "45",
+      "name": "Texas Instruments",
+      "models": [
+        {
+          "id": "45:compact computer 40",
+          "name": "Compact Computer 40",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "45:explorer",
+          "name": "Explorer",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "45:professional computer",
+          "name": "Professional Computer",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "45:professional portable computer",
+          "name": "Professional Portable Computer",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "45:ti-99/4",
+          "name": "TI-99/4",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1981
+        },
+        {
+          "id": "45:ti-99/4a",
+          "name": "TI-99/4A",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1984
+        }
+      ]
+    },
+    {
+      "id": "46",
+      "name": "Toshiba",
+      "models": [
+        {
+          "id": "46:libretto 20",
+          "name": "Libretto 20",
+          "productionYearStart": 1996,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "46:portege 300ct",
+          "name": "Portege 300CT",
+          "productionYearStart": 1997,
+          "productionYearEnd": 1998
+        },
+        {
+          "id": "46:satellite pro 400",
+          "name": "Satellite Pro 400",
+          "productionYearStart": 1995,
+          "productionYearEnd": 1997
+        },
+        {
+          "id": "46:t1000",
+          "name": "T1000",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "46:t1100",
+          "name": "T1100",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "46:t1100 plus",
+          "name": "T1100 Plus",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "46:t1200",
+          "name": "T1200",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1988
+        },
+        {
+          "id": "46:t1600",
+          "name": "T1600",
+          "productionYearStart": 1990,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "46:t3100",
+          "name": "T3100",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "46:t3200",
+          "name": "T3200",
+          "productionYearStart": 1987,
+          "productionYearEnd": 1990
+        },
+        {
+          "id": "46:t5100",
+          "name": "T5100",
+          "productionYearStart": 1988,
+          "productionYearEnd": 1990
+        }
+      ]
+    },
+    {
+      "id": "47",
+      "name": "Unisys",
+      "models": [
+        {
+          "id": "47:2200/100",
+          "name": "2200/100",
+          "productionYearStart": 1990,
+          "productionYearEnd": null
+        },
+        {
+          "id": "47:2200/200",
+          "name": "2200/200",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "47:2200/400",
+          "name": "2200/400",
+          "productionYearStart": 1988,
+          "productionYearEnd": null
+        },
+        {
+          "id": "47:2200/500",
+          "name": "2200/500",
+          "productionYearStart": 1993,
+          "productionYearEnd": null
+        },
+        {
+          "id": "47:2200/600",
+          "name": "2200/600",
+          "productionYearStart": 1989,
+          "productionYearEnd": null
+        },
+        {
+          "id": "47:2200/900",
+          "name": "2200/900",
+          "productionYearStart": 1993,
+          "productionYearEnd": null
+        },
+        {
+          "id": "47:clearpath dorado 100",
+          "name": "ClearPath Dorado 100",
+          "productionYearStart": 2003,
+          "productionYearEnd": null
+        },
+        {
+          "id": "47:clearpath ix4400",
+          "name": "ClearPath IX4400",
+          "productionYearStart": 1996,
+          "productionYearEnd": null
+        },
+        {
+          "id": "47:clearpath ix4800",
+          "name": "ClearPath IX4800",
+          "productionYearStart": 1997,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "48",
+      "name": "Wang Laboratories",
+      "models": [
+        {
+          "id": "48:2200",
+          "name": "2200",
+          "productionYearStart": 1973,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "48:2200 pcs",
+          "name": "2200 PCS",
+          "productionYearStart": 1976,
+          "productionYearEnd": null
+        },
+        {
+          "id": "48:alliance",
+          "name": "Alliance",
+          "productionYearStart": 1986,
+          "productionYearEnd": null
+        },
+        {
+          "id": "48:professional computer",
+          "name": "Professional Computer",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "48:vs",
+          "name": "VS",
+          "productionYearStart": 1977,
+          "productionYearEnd": null
+        }
+      ]
+    },
+    {
+      "id": "49",
+      "name": "Xerox",
+      "models": [
+        {
+          "id": "49:4045",
+          "name": "4045",
+          "productionYearStart": 1983,
+          "productionYearEnd": null
+        },
+        {
+          "id": "49:6085",
+          "name": "6085",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "49:820",
+          "name": "820",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "49:860",
+          "name": "860",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1986
+        },
+        {
+          "id": "49:alto",
+          "name": "Alto",
+          "productionYearStart": 1973,
+          "productionYearEnd": 1980
+        },
+        {
+          "id": "49:notetaker",
+          "name": "NoteTaker",
+          "productionYearStart": 1978,
+          "productionYearEnd": 1978
+        },
+        {
+          "id": "49:star 8010",
+          "name": "Star 8010",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1985
+        }
+      ]
+    },
+    {
+      "id": "50",
+      "name": "Zenith Data Systems",
+      "models": [
+        {
+          "id": "50:minisport",
+          "name": "MinisPort",
+          "productionYearStart": 1989,
+          "productionYearEnd": 1991
+        },
+        {
+          "id": "50:z-100",
+          "name": "Z-100",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "50:z-150",
+          "name": "Z-150",
+          "productionYearStart": 1982,
+          "productionYearEnd": 1985
+        },
+        {
+          "id": "50:z-160",
+          "name": "Z-160",
+          "productionYearStart": 1983,
+          "productionYearEnd": 1984
+        },
+        {
+          "id": "50:z-171",
+          "name": "Z-171",
+          "productionYearStart": 1985,
+          "productionYearEnd": 1987
+        },
+        {
+          "id": "50:z-181",
+          "name": "Z-181",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "50:z-248",
+          "name": "Z-248",
+          "productionYearStart": 1986,
+          "productionYearEnd": 1989
+        },
+        {
+          "id": "50:z-89",
+          "name": "Z-89",
+          "productionYearStart": 1979,
+          "productionYearEnd": 1982
+        },
+        {
+          "id": "50:z-90",
+          "name": "Z-90",
+          "productionYearStart": 1981,
+          "productionYearEnd": 1983
+        }
+      ]
+    }
+  ]
+}

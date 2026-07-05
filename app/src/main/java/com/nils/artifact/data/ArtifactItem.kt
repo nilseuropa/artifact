@@ -11,8 +11,12 @@ import java.util.UUID
 @Entity(tableName = "items")
 data class ArtifactItem(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val manufacturerId: String?,
     val manufacturer: String,
+    val modelId: String?,
     val itemType: String,
+    val productionYearStart: Int?,
+    val productionYearEnd: Int?,
     val serialNumber: String,
     val location: String,
     val notes: String,

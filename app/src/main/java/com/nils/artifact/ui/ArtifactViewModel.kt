@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.nils.artifact.data.ArtifactDatabase
 import com.nils.artifact.data.ArtifactRepository
 import com.nils.artifact.data.ArtifactWithPhotos
+import com.nils.artifact.data.CatalogData
+import com.nils.artifact.data.CatalogSeed
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,6 +26,9 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
         ArtifactDatabase.get(application).artifactDao(),
     )
 
+    private val _catalog = MutableStateFlow(CatalogData.Empty)
+    val catalog: StateFlow<CatalogData> = _catalog.asStateFlow()
+
     val items: StateFlow<List<ArtifactWithPhotos>> = repository.observeItems()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -34,13 +39,23 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
         .flatMapLatest(repository::searchItems)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            _catalog.value = CatalogSeed.load(application)
+        }
+    }
+
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }
 
     fun addItem(
+        manufacturerId: String?,
         manufacturer: String,
+        modelId: String?,
         itemType: String,
+        productionYearStart: Int?,
+        productionYearEnd: Int?,
         serialNumber: String,
         location: String,
         notes: String,
@@ -49,8 +64,12 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
     ) {
         viewModelScope.launch {
             repository.addItem(
+                manufacturerId = manufacturerId,
                 manufacturer = manufacturer,
+                modelId = modelId,
                 itemType = itemType,
+                productionYearStart = productionYearStart,
+                productionYearEnd = productionYearEnd,
                 serialNumber = serialNumber,
                 location = location,
                 notes = notes,

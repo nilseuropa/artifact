@@ -15,6 +15,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -75,8 +76,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -85,6 +88,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.nils.artifact.data.ArtifactWithPhotos
+import com.nils.artifact.data.CatalogData
+import com.nils.artifact.data.CatalogManufacturer
+import com.nils.artifact.data.CatalogModel
 import java.io.File
 import java.text.DateFormat
 import java.util.Date
@@ -96,6 +102,17 @@ private enum class Screen {
     Manage,
     Add,
 }
+
+private data class ModelSuggestion(
+    val manufacturer: CatalogManufacturer,
+    val model: CatalogModel,
+)
+
+private data class TextSuggestion(
+    val primary: String,
+    val secondary: String?,
+    val onClick: () -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -376,6 +393,7 @@ private fun AddItemScreen(
     viewModel: ArtifactViewModel,
     onDone: () -> Unit,
 ) {
+    val catalog by viewModel.catalog.collectAsState()
     var manufacturer by rememberSaveable { mutableStateOf("") }
     var itemType by rememberSaveable { mutableStateOf("") }
     var serialNumber by rememberSaveable { mutableStateOf("") }
@@ -387,6 +405,32 @@ private fun AddItemScreen(
         manufacturer.isNotBlank() &&
         itemType.isNotBlank() &&
         location.isNotBlank()
+    val selectedManufacturer = catalog.findManufacturer(manufacturer)
+    val selectedModel = catalog.findModel(selectedManufacturer, itemType)
+    val manufacturerSuggestions = catalog.manufacturerSuggestions(manufacturer)
+        .map { suggestion ->
+            TextSuggestion(
+                primary = suggestion.name,
+                secondary = "${suggestion.models.size} model${if (suggestion.models.size == 1) "" else "s"}",
+                onClick = { manufacturer = suggestion.name },
+            )
+        }
+    val modelSuggestions = catalog.modelSuggestions(
+        manufacturer = selectedManufacturer,
+        query = itemType,
+    ).map { suggestion ->
+        TextSuggestion(
+            primary = suggestion.model.name,
+            secondary = listOfNotNull(
+                suggestion.manufacturer.name.takeUnless { selectedManufacturer != null },
+                suggestion.model.productionYearsLabel(),
+            ).joinToString(" / ").ifBlank { null },
+            onClick = {
+                manufacturer = suggestion.manufacturer.name
+                itemType = suggestion.model.name
+            },
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -421,20 +465,27 @@ private fun AddItemScreen(
             )
         }
 
-        OutlinedTextField(
+        SuggestionTextField(
             value = manufacturer,
-            onValueChange = { manufacturer = it },
-            label = { Text("Manufacturer") },
-            singleLine = true,
+            onValueChange = { value -> manufacturer = value },
+            label = "Manufacturer",
+            suggestions = manufacturerSuggestions,
             modifier = Modifier.fillMaxWidth(),
         )
-        OutlinedTextField(
+        SuggestionTextField(
             value = itemType,
-            onValueChange = { itemType = it },
-            label = { Text("Type") },
-            singleLine = true,
+            onValueChange = { value -> itemType = value },
+            label = "Type",
+            suggestions = modelSuggestions,
             modifier = Modifier.fillMaxWidth(),
         )
+        selectedModel?.productionYearsLabel()?.let { years ->
+            Text(
+                text = "Catalog production years: $years",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         OutlinedTextField(
             value = serialNumber,
             onValueChange = { serialNumber = it },
@@ -459,8 +510,12 @@ private fun AddItemScreen(
         Button(
             onClick = {
                 viewModel.addItem(
+                    manufacturerId = selectedManufacturer?.id,
                     manufacturer = manufacturer,
+                    modelId = selectedModel?.id,
                     itemType = itemType,
+                    productionYearStart = selectedModel?.productionYearStart,
+                    productionYearEnd = selectedModel?.productionYearEnd,
                     serialNumber = serialNumber,
                     location = location,
                     notes = notes,
@@ -475,6 +530,72 @@ private fun AddItemScreen(
             Icon(Icons.Default.Check, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text("Save Item")
+        }
+    }
+}
+
+@Composable
+private fun SuggestionTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    suggestions: List<TextSuggestion>,
+    modifier: Modifier = Modifier,
+) {
+    var focused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState -> focused = focusState.isFocused },
+        )
+        if (focused && suggestions.isNotEmpty()) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                    suggestions.take(8).forEach { suggestion ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    suggestion.onClick()
+                                    focusManager.clearFocus()
+                                }
+                                .padding(horizontal = 12.dp, vertical = 9.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Text(
+                                text = suggestion.primary,
+                                style = MaterialTheme.typography.bodyLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            suggestion.secondary?.let { secondary ->
+                                Text(
+                                    text = secondary,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -775,6 +896,9 @@ private fun ArtifactListItem(
                 )
                 InfoLine(label = "Serial", value = item.serialNumber.ifBlank { "Not recorded" })
                 InfoLine(label = "Location", value = item.location.ifBlank { "Not recorded" })
+                item.productionYearsLabel()?.let { years ->
+                    InfoLine(label = "Years", value = years)
+                }
                 InfoLine(
                     label = "Added",
                     value = DateFormat.getDateTimeInstance(
@@ -842,6 +966,76 @@ private fun InfoLine(label: String, value: String) {
         )
     }
 }
+
+private fun CatalogData.findManufacturer(query: String): CatalogManufacturer? =
+    manufacturers.firstOrNull { manufacturer ->
+        manufacturer.name.equals(query.trim(), ignoreCase = true)
+    }
+
+private fun CatalogData.findModel(
+    manufacturer: CatalogManufacturer?,
+    query: String,
+): CatalogModel? {
+    val cleanQuery = query.trim()
+    if (cleanQuery.isBlank()) return null
+    val candidates = manufacturer?.models ?: manufacturers.asSequence().flatMap { it.models.asSequence() }.toList()
+    return candidates.firstOrNull { model ->
+        model.name.equals(cleanQuery, ignoreCase = true)
+    }
+}
+
+private fun CatalogData.manufacturerSuggestions(query: String): List<CatalogManufacturer> {
+    val cleanQuery = query.trim()
+    return manufacturers
+        .asSequence()
+        .filter { manufacturer ->
+            cleanQuery.isBlank() || manufacturer.name.contains(cleanQuery, ignoreCase = true)
+        }
+        .take(8)
+        .toList()
+}
+
+private fun CatalogData.modelSuggestions(
+    manufacturer: CatalogManufacturer?,
+    query: String,
+): List<ModelSuggestion> {
+    val cleanQuery = query.trim()
+    val candidates = if (manufacturer != null) {
+        sequence {
+            manufacturer.models.forEach { model ->
+                yield(ModelSuggestion(manufacturer = manufacturer, model = model))
+            }
+        }
+    } else {
+        manufacturers.asSequence().flatMap { currentManufacturer ->
+            currentManufacturer.models.asSequence().map { model ->
+                ModelSuggestion(manufacturer = currentManufacturer, model = model)
+            }
+        }
+    }
+
+    return candidates
+        .filter { suggestion ->
+            cleanQuery.isBlank() || suggestion.model.name.contains(cleanQuery, ignoreCase = true)
+        }
+        .take(8)
+        .toList()
+}
+
+private fun CatalogModel.productionYearsLabel(): String? =
+    productionYearsLabel(productionYearStart, productionYearEnd)
+
+private fun com.nils.artifact.data.ArtifactItem.productionYearsLabel(): String? =
+    productionYearsLabel(productionYearStart, productionYearEnd)
+
+private fun productionYearsLabel(start: Int?, end: Int?): String? =
+    when {
+        start != null && end != null && start == end -> start.toString()
+        start != null && end != null -> "$start-$end"
+        start != null -> "$start-"
+        end != null -> "-$end"
+        else -> null
+    }
 
 @Composable
 private fun EmptyState(
