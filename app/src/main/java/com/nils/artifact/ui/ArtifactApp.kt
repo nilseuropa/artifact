@@ -3,6 +3,7 @@ package com.nils.artifact.ui
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Environment
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -79,6 +80,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -98,6 +100,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.nils.artifact.label.ArtifactLabelRenderer
+import com.nils.artifact.label.NiimbotDevice
+import com.nils.artifact.label.NiimbotPrinter
 import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
@@ -107,6 +111,7 @@ import com.nils.artifact.data.CollectionSettings
 import java.io.File
 import java.text.DateFormat
 import java.util.Date
+import kotlinx.coroutines.launch
 
 private enum class Screen {
     Home,
@@ -1044,8 +1049,91 @@ private fun LabelPreviewDialog(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val labelBitmap = remember(item, settings) {
         ArtifactLabelRenderer.render(item = item, settings = settings)
+    }
+    var hasBluetoothPermission by remember {
+        mutableStateOf(NiimbotPrinter.hasBluetoothConnectPermission(context))
+    }
+    var pendingNiimbotPrint by remember { mutableStateOf(false) }
+    var isNiimbotPrinting by remember { mutableStateOf(false) }
+    var statusMessage by remember { mutableStateOf<String?>(null) }
+    var pairedDevices by remember { mutableStateOf<List<NiimbotDevice>>(emptyList()) }
+    var showDeviceChooser by remember { mutableStateOf(false) }
+    val bluetoothPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        hasBluetoothPermission = granted
+        if (granted) {
+            pendingNiimbotPrint = true
+        } else {
+            statusMessage = "Bluetooth permission is required for NIIMBOT printing."
+        }
+    }
+
+    fun printToNiimbot(device: NiimbotDevice) {
+        showDeviceChooser = false
+        scope.launch {
+            isNiimbotPrinting = true
+            statusMessage = "Printing to ${device.displayName}..."
+            val result = runCatching {
+                NiimbotPrinter.printLabel(
+                    context = context,
+                    device = device,
+                    bitmap = labelBitmap,
+                )
+            }
+            isNiimbotPrinting = false
+            statusMessage = result.fold(
+                onSuccess = { "Label sent to ${device.displayName}." },
+                onFailure = { error -> error.message ?: "NIIMBOT printing failed." },
+            )
+        }
+    }
+
+    fun startNiimbotPrint() {
+        if (NiimbotPrinter.needsBluetoothConnectPermission() && !hasBluetoothPermission) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                bluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+            return
+        }
+
+        scope.launch {
+            statusMessage = "Looking for paired Bluetooth printers..."
+            val devices = runCatching { NiimbotPrinter.pairedDevices(context) }
+                .onFailure { error ->
+                    statusMessage = error.message ?: "Could not read paired Bluetooth devices."
+                }
+                .getOrDefault(emptyList())
+            if (devices.isEmpty()) {
+                statusMessage = "No paired Bluetooth devices found."
+                return@launch
+            }
+
+            val likelyPrinters = devices.filter { device -> device.isLikelyNiimbot }
+            val selectedDevice = when {
+                likelyPrinters.size == 1 -> likelyPrinters.single()
+                devices.size == 1 -> devices.single()
+                else -> null
+            }
+
+            if (selectedDevice != null) {
+                printToNiimbot(selectedDevice)
+            } else {
+                pairedDevices = devices
+                showDeviceChooser = true
+                statusMessage = "Choose the paired NIIMBOT printer."
+            }
+        }
+    }
+
+    LaunchedEffect(pendingNiimbotPrint) {
+        if (pendingNiimbotPrint) {
+            pendingNiimbotPrint = false
+            startNiimbotPrint()
+        }
     }
 
     AlertDialog(
@@ -1076,20 +1164,42 @@ private fun LabelPreviewDialog(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                statusMessage?.let { message ->
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (message.contains("failed", ignoreCase = true) ||
+                            message.contains("required", ignoreCase = true) ||
+                            message.contains("No paired", ignoreCase = true)
+                        ) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    )
+                }
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    ArtifactLabelRenderer.print(
-                        context = context,
-                        bitmap = labelBitmap,
-                        uid = item.catalogUid,
-                    )
-                    onDismiss()
-                },
-            ) {
-                Text("Print")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(
+                    enabled = !isNiimbotPrinting,
+                    onClick = { startNiimbotPrint() },
+                ) {
+                    Text(if (isNiimbotPrinting) "Printing..." else "NIIMBOT")
+                }
+                TextButton(
+                    onClick = {
+                        ArtifactLabelRenderer.print(
+                            context = context,
+                            bitmap = labelBitmap,
+                            uid = item.catalogUid,
+                        )
+                        onDismiss()
+                    },
+                ) {
+                    Text("System Print")
+                }
             }
         },
         dismissButton = {
@@ -1098,6 +1208,42 @@ private fun LabelPreviewDialog(
             }
         },
     )
+
+    if (showDeviceChooser) {
+        AlertDialog(
+            onDismissRequest = { showDeviceChooser = false },
+            title = { Text("Choose NIIMBOT Printer") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    pairedDevices.forEach { device ->
+                        TextButton(
+                            onClick = { printToNiimbot(device) },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.Start,
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
+                            ) {
+                                Text(device.displayName)
+                                Text(
+                                    text = device.address,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showDeviceChooser = false }) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
 }
 
 @Composable
