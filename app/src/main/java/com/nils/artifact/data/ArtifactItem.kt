@@ -8,9 +8,13 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import java.util.UUID
 
-@Entity(tableName = "items")
+@Entity(
+    tableName = "items",
+    indices = [Index(value = ["catalogUid"], unique = true)],
+)
 data class ArtifactItem(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val catalogUid: Long = 0,
     val manufacturerId: String?,
     val manufacturer: String,
     val modelId: String?,
@@ -22,6 +26,13 @@ data class ArtifactItem(
     val notes: String,
     val createdAt: Long,
     val updatedAt: Long,
+)
+
+@Entity(tableName = "catalog_uid_allocations")
+data class CatalogUidAllocation(
+    @PrimaryKey val uid: Long,
+    val itemId: String,
+    val allocatedAt: Long,
 )
 
 @Entity(

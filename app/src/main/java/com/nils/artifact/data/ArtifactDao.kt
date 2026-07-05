@@ -17,7 +17,8 @@ interface ArtifactDao {
     @Query(
         """
         SELECT * FROM items
-        WHERE manufacturer LIKE '%' || :query || '%'
+        WHERE CAST(catalogUid AS TEXT) LIKE '%' || :query || '%'
+            OR manufacturer LIKE '%' || :query || '%'
             OR itemType LIKE '%' || :query || '%'
             OR serialNumber LIKE '%' || :query || '%'
             OR location LIKE '%' || :query || '%'
@@ -30,14 +31,28 @@ interface ArtifactDao {
     suspend fun insertItem(item: ArtifactItem)
 
     @Insert
+    suspend fun insertUidAllocation(allocation: CatalogUidAllocation)
+
+    @Insert
     suspend fun insertPhotos(photos: List<ArtifactPhoto>)
+
+    @Query("SELECT COALESCE(MAX(uid), 0) + 1 FROM catalog_uid_allocations")
+    suspend fun nextCatalogUid(): Long
 
     @Delete
     suspend fun deleteItem(item: ArtifactItem)
 
     @Transaction
     suspend fun insertItemWithPhotos(item: ArtifactItem, photos: List<ArtifactPhoto>) {
-        insertItem(item)
+        val uid = nextCatalogUid()
+        insertUidAllocation(
+            CatalogUidAllocation(
+                uid = uid,
+                itemId = item.id,
+                allocatedAt = item.createdAt,
+            ),
+        )
+        insertItem(item.copy(catalogUid = uid))
         insertPhotos(photos)
     }
 }

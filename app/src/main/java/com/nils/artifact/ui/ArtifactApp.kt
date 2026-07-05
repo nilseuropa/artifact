@@ -882,7 +882,7 @@ private fun ArtifactListItem(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    text = item.manufacturer.ifBlank { "Unknown manufacturer" },
+                    text = "#${item.catalogUid} ${item.manufacturer.ifBlank { "Unknown manufacturer" }}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
