@@ -983,15 +983,6 @@ private fun DetailScreen(
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
         )
-        Button(
-            onClick = { onPrintLabel(item) },
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Icon(Icons.Default.Print, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Print Label")
-        }
 
         PhotoGallery(
             photoPaths = photoPaths,
@@ -1106,6 +1097,15 @@ private fun DetailScreen(
         )
         DetailReadOnlyRow(label = "Added", value = formatTimestamp(item.createdAt))
         DetailReadOnlyRow(label = "Updated", value = formatTimestamp(item.updatedAt))
+        Button(
+            onClick = { onPrintLabel(item) },
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.Print, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Print Label")
+        }
     }
 
     editTextTarget?.let { target ->
