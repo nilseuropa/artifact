@@ -15,6 +15,7 @@ class ArtifactRepository(private val dao: ArtifactDao) {
     }
 
     suspend fun addItem(
+        category: String,
         manufacturerId: String?,
         manufacturer: String,
         modelId: String?,
@@ -29,6 +30,7 @@ class ArtifactRepository(private val dao: ArtifactDao) {
     ): ArtifactItem {
         val now = System.currentTimeMillis()
         val item = ArtifactItem(
+            category = ArtifactCategories.normalize(category),
             manufacturerId = manufacturerId,
             manufacturer = manufacturer.trim(),
             modelId = modelId,
@@ -57,7 +59,12 @@ class ArtifactRepository(private val dao: ArtifactDao) {
     }
 
     suspend fun updateItem(item: ArtifactItem) {
-        dao.updateItem(item.copy(updatedAt = System.currentTimeMillis()))
+        dao.updateItem(
+            item.copy(
+                category = ArtifactCategories.normalize(item.category),
+                updatedAt = System.currentTimeMillis(),
+            ),
+        )
     }
 
     suspend fun backupSnapshot(): ArtifactBackupSnapshot =

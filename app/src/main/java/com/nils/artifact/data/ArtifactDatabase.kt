@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [ArtifactItem::class, ArtifactPhoto::class, CatalogUidAllocation::class],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class ArtifactDatabase : RoomDatabase() {
@@ -26,7 +26,7 @@ abstract class ArtifactDatabase : RoomDatabase() {
                     ArtifactDatabase::class.java,
                     "artifact.db",
                 )
-                    .addMigrations(Migration1To2, Migration2To3, Migration3To4)
+                    .addMigrations(Migration1To2, Migration2To3, Migration3To4, Migration4To5)
                     .build()
                     .also { instance = it }
             }
@@ -84,6 +84,12 @@ abstract class ArtifactDatabase : RoomDatabase() {
         private val Migration3To4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE items ADD COLUMN estimatedValue REAL")
+            }
+        }
+
+        private val Migration4To5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE items ADD COLUMN category TEXT NOT NULL DEFAULT 'Other'")
             }
         }
     }

@@ -49,6 +49,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -112,6 +113,7 @@ import com.google.zxing.MultiFormatReader
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.nils.artifact.data.ArtifactBackupArchive
+import com.nils.artifact.data.ArtifactCategories
 import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
@@ -165,6 +167,11 @@ private data class EditYearsTarget(
     val initialStart: Int?,
     val initialEnd: Int?,
     val onSave: (Int?, Int?) -> Unit,
+)
+
+private data class EditCategoryTarget(
+    val initialCategory: String,
+    val onSave: (String) -> Unit,
 )
 
 private data class EditValueTarget(
@@ -883,6 +890,7 @@ private fun AddItemScreen(
 ) {
     val catalog by viewModel.catalog.collectAsState()
     var manufacturer by rememberSaveable { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf(ArtifactCategories.DEFAULT) }
     var itemType by rememberSaveable { mutableStateOf("") }
     var serialNumber by rememberSaveable { mutableStateOf("") }
     var location by rememberSaveable { mutableStateOf("") }
@@ -957,6 +965,11 @@ private fun AddItemScreen(
             )
         }
 
+        CategoryPicker(
+            value = category,
+            onValueChange = { value -> category = value },
+            modifier = Modifier.fillMaxWidth(),
+        )
         SuggestionTextField(
             value = manufacturer,
             onValueChange = { value -> manufacturer = value },
@@ -1017,6 +1030,7 @@ private fun AddItemScreen(
         Button(
             onClick = {
                 viewModel.addItem(
+                    category = category,
                     manufacturerId = selectedManufacturer?.id,
                     manufacturer = manufacturer,
                     modelId = selectedModel?.id,
@@ -1042,6 +1056,7 @@ private fun AddItemScreen(
         OutlinedButton(
             onClick = {
                 viewModel.addItem(
+                    category = category,
                     manufacturerId = selectedManufacturer?.id,
                     manufacturer = manufacturer,
                     modelId = selectedModel?.id,
@@ -1134,6 +1149,99 @@ private fun SuggestionTextField(
 }
 
 @Composable
+private fun CategoryPicker(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showPicker by remember { mutableStateOf(false) }
+
+    OutlinedButton(
+        onClick = { showPicker = true },
+        shape = RoundedCornerShape(8.dp),
+        contentPadding = PaddingValues(16.dp),
+        modifier = modifier.heightIn(min = 64.dp),
+    ) {
+        Icon(Icons.Default.Category, contentDescription = null)
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalAlignment = Alignment.Start,
+        ) {
+            Text(
+                text = "Category",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+
+    if (showPicker) {
+        CategoryPickerDialog(
+            selectedCategory = value,
+            onSelect = { category ->
+                onValueChange(category)
+                showPicker = false
+            },
+            onDismiss = { showPicker = false },
+        )
+    }
+}
+
+@Composable
+private fun CategoryPickerDialog(
+    selectedCategory: String,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Choose Category") },
+        text = {
+            LazyColumn(
+                modifier = Modifier.heightIn(max = 420.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                items(ArtifactCategories.ALL, key = { category -> category }) { category ->
+                    TextButton(
+                        onClick = { onSelect(category) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = category,
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            if (category == selectedCategory) {
+                                Icon(Icons.Default.Check, contentDescription = null)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+    )
+}
+
+@Composable
 private fun DetailScreen(
     artifact: ArtifactWithPhotos?,
     catalog: CatalogData,
@@ -1156,6 +1264,7 @@ private fun DetailScreen(
     var fullscreenPhotoPath by rememberSaveable(item.id) { mutableStateOf<String?>(null) }
     var editTextTarget by remember { mutableStateOf<EditTextTarget?>(null) }
     var editYearsTarget by remember { mutableStateOf<EditYearsTarget?>(null) }
+    var editCategoryTarget by remember { mutableStateOf<EditCategoryTarget?>(null) }
     var editValueTarget by remember { mutableStateOf<EditValueTarget?>(null) }
     val photoPaths = artifact.photos.map { photo -> photo.filePath }
 
@@ -1186,6 +1295,16 @@ private fun DetailScreen(
         )
 
         DetailReadOnlyRow(label = "UID", value = "#${item.catalogUid}")
+        DetailEditableRow(
+            label = "Category",
+            value = item.category,
+            onEdit = {
+                editCategoryTarget = EditCategoryTarget(
+                    initialCategory = item.category,
+                    onSave = { value -> onUpdate(item.copy(category = value)) },
+                )
+            },
+        )
         DetailEditableRow(
             label = "Manufacturer",
             value = item.manufacturer.ifBlank { "Not recorded" },
@@ -1323,6 +1442,13 @@ private fun DetailScreen(
         EditYearsDialog(
             target = target,
             onDismiss = { editYearsTarget = null },
+        )
+    }
+
+    editCategoryTarget?.let { target ->
+        EditCategoryDialog(
+            target = target,
+            onDismiss = { editCategoryTarget = null },
         )
     }
 
@@ -1843,6 +1969,21 @@ private fun EditYearsDialog(
 }
 
 @Composable
+private fun EditCategoryDialog(
+    target: EditCategoryTarget,
+    onDismiss: () -> Unit,
+) {
+    CategoryPickerDialog(
+        selectedCategory = ArtifactCategories.normalize(target.initialCategory),
+        onSelect = { category ->
+            target.onSave(category)
+            onDismiss()
+        },
+        onDismiss = onDismiss,
+    )
+}
+
+@Composable
 private fun EditValueDialog(
     target: EditValueTarget,
     onDismiss: () -> Unit,
@@ -2329,6 +2470,7 @@ private fun ArtifactListItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                InfoLine(label = "Category", value = item.category)
                 InfoLine(label = "Serial", value = item.serialNumber.ifBlank { "Not recorded" })
                 InfoLine(label = "Location", value = item.location.ifBlank { "Not recorded" })
                 item.productionYearsLabel()?.let { years ->

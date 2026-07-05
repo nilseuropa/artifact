@@ -15,6 +15,7 @@ import java.util.UUID
 data class ArtifactItem(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val catalogUid: Long = 0,
+    val category: String,
     val manufacturerId: String?,
     val manufacturer: String,
     val modelId: String?,
@@ -60,3 +61,37 @@ data class ArtifactWithPhotos(
     @Relation(parentColumn = "id", entityColumn = "itemId")
     val photos: List<ArtifactPhoto>,
 )
+
+object ArtifactCategories {
+    const val DEFAULT = "Other"
+
+    val ALL = listOf(
+        "Laptop",
+        "Desktop",
+        "Palmtop",
+        "Handheld",
+        "Workstation",
+        "Server",
+        "Terminal",
+        "Monitor",
+        "Keyboard",
+        "Mouse",
+        "Printer",
+        "Storage",
+        "Expansion card",
+        "Peripheral",
+        "Software",
+        "Manual",
+        "Cable",
+        "Memorabilia",
+        "Prototype",
+        DEFAULT,
+    )
+
+    fun normalize(value: String?): String {
+        val cleanValue = value?.trim().orEmpty()
+        return ALL.firstOrNull { category ->
+            category.equals(cleanValue, ignoreCase = true)
+        } ?: DEFAULT
+    }
+}

@@ -19,6 +19,7 @@ interface ArtifactDao {
         """
         SELECT * FROM items
         WHERE CAST(catalogUid AS TEXT) LIKE '%' || :query || '%'
+            OR category LIKE '%' || :query || '%'
             OR manufacturer LIKE '%' || :query || '%'
             OR itemType LIKE '%' || :query || '%'
             OR serialNumber LIKE '%' || :query || '%'

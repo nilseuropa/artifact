@@ -29,7 +29,7 @@ data class ArtifactRestorePhoto(
 object ArtifactBackupArchive {
     const val FILE_EXTENSION = "artifactbackup"
     private const val FORMAT_VERSION = 1
-    private const val DATABASE_VERSION = 4
+    private const val DATABASE_VERSION = 5
 
     fun write(
         outputStream: OutputStream,
@@ -213,6 +213,9 @@ object ArtifactBackupArchive {
             require(item.id.isNotBlank()) {
                 "Backup contains an item with a blank id."
             }
+            require(item.category.isNotBlank()) {
+                "Backup contains an item with a blank category."
+            }
             require(itemIds.add(item.id)) {
                 "Backup contains duplicate item id ${item.id}."
             }
@@ -282,6 +285,7 @@ object ArtifactBackupArchive {
         JSONObject()
             .put("id", id)
             .put("catalogUid", catalogUid)
+            .put("category", category)
             .putNullable("manufacturerId", manufacturerId)
             .put("manufacturer", manufacturer)
             .putNullable("modelId", modelId)
@@ -299,6 +303,7 @@ object ArtifactBackupArchive {
         ArtifactItem(
             id = getString("id"),
             catalogUid = getLong("catalogUid"),
+            category = ArtifactCategories.normalize(optString("category", ArtifactCategories.DEFAULT)),
             manufacturerId = optNullableString("manufacturerId"),
             manufacturer = getString("manufacturer"),
             modelId = optNullableString("modelId"),

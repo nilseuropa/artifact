@@ -59,6 +59,7 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun addItem(
+        category: String,
         manufacturerId: String?,
         manufacturer: String,
         modelId: String?,
@@ -74,6 +75,7 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
     ) {
         viewModelScope.launch {
             val item = repository.addItem(
+                category = category,
                 manufacturerId = manufacturerId,
                 manufacturer = manufacturer,
                 modelId = modelId,
