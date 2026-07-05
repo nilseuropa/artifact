@@ -9,8 +9,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -54,6 +56,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -99,22 +102,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
-import com.nils.artifact.label.ArtifactLabelRenderer
-import com.nils.artifact.label.NiimbotDevice
-import com.nils.artifact.label.NiimbotPrinter
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.DecodeHintType
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.PlanarYUVLuminanceSource
+import com.google.zxing.common.HybridBinarizer
 import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
 import com.nils.artifact.data.CatalogManufacturer
 import com.nils.artifact.data.CatalogModel
 import com.nils.artifact.data.CollectionSettings
+import com.nils.artifact.label.ArtifactLabelRenderer
+import com.nils.artifact.label.NiimbotDevice
+import com.nils.artifact.label.NiimbotPrinter
+import org.json.JSONObject
 import java.io.File
 import java.text.DateFormat
 import java.util.Date
+import java.util.concurrent.Executors
 import kotlinx.coroutines.launch
 
 private enum class Screen {
     Home,
+    Scan,
     Browse,
     Search,
     Manage,
@@ -205,11 +217,17 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                 Screen.Home -> HomeScreen(
                     itemCount = items.size,
                     collectionSettings = collectionSettings,
+                    onScan = { screenName = Screen.Scan.name },
                     onBrowse = { screenName = Screen.Browse.name },
                     onSearch = { screenName = Screen.Search.name },
                     onManage = { screenName = Screen.Manage.name },
                     onAdd = { screenName = Screen.Add.name },
                     onSettings = { screenName = Screen.Settings.name },
+                )
+
+                Screen.Scan -> QrScanScreen(
+                    items = items,
+                    onOpen = { artifact -> openDetail(Screen.Home, artifact) },
                 )
 
                 Screen.Browse -> BrowseScreen(
@@ -266,6 +284,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
 private fun Screen.title(): String =
     when (this) {
         Screen.Home -> "Artifact"
+        Screen.Scan -> "Identify Item"
         Screen.Browse -> "Browse"
         Screen.Search -> "Search"
         Screen.Manage -> "Manage Collection"
@@ -278,6 +297,7 @@ private fun Screen.title(): String =
 private fun HomeScreen(
     itemCount: Int,
     collectionSettings: CollectionSettings,
+    onScan: () -> Unit,
     onBrowse: () -> Unit,
     onSearch: () -> Unit,
     onManage: () -> Unit,
@@ -309,6 +329,12 @@ private fun HomeScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(modifier = Modifier.height(8.dp))
+        MenuAction(
+            label = "Identify Item",
+            supportingText = "Read an Artifact QR label",
+            icon = { Icon(Icons.Default.QrCodeScanner, contentDescription = null) },
+            onClick = onScan,
+        )
         MenuAction(
             label = "Browse",
             supportingText = "Review every cataloged item",
@@ -475,6 +501,68 @@ private fun ManageScreen(
                 }
             },
         )
+    }
+}
+
+@Composable
+private fun QrScanScreen(
+    items: List<ArtifactWithPhotos>,
+    onOpen: (ArtifactWithPhotos) -> Unit,
+) {
+    var scanMessage by remember { mutableStateOf("Ready to scan") }
+    var lastPayload by rememberSaveable { mutableStateOf<String?>(null) }
+    var openedItem by rememberSaveable { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        CameraPermissionScanner(
+            onQrPayload = { payload ->
+                if (openedItem || payload == lastPayload) return@CameraPermissionScanner
+                lastPayload = payload
+
+                val uid = artifactUidFromQrPayload(payload)
+                if (uid == null) {
+                    scanMessage = "QR code does not contain an Artifact UID."
+                    return@CameraPermissionScanner
+                }
+
+                val artifact = items.firstOrNull { current ->
+                    current.item.catalogUid == uid
+                }
+                if (artifact == null) {
+                    scanMessage = "No local item found for UID #$uid."
+                } else {
+                    openedItem = true
+                    scanMessage = "Found UID #$uid."
+                    onOpen(artifact)
+                }
+            },
+            onError = { error -> scanMessage = error },
+        )
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = scanMessage,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (scanMessage.startsWith("No local") ||
+                    scanMessage.startsWith("QR code") ||
+                    scanMessage.contains("failed", ignoreCase = true)
+                ) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                modifier = Modifier.padding(14.dp),
+            )
+        }
     }
 }
 
@@ -1544,6 +1632,142 @@ private fun EditYearsDialog(
 }
 
 @Composable
+private fun CameraPermissionScanner(
+    onQrPayload: (String) -> Unit,
+    onError: (String) -> Unit,
+) {
+    val context = LocalContext.current
+    var hasPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA,
+            ) == PackageManager.PERMISSION_GRANTED,
+        )
+    }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        hasPermission = granted
+    }
+
+    LaunchedEffect(Unit) {
+        if (!hasPermission) {
+            launcher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    if (hasPermission) {
+        QrScannerPreview(
+            onQrPayload = onQrPayload,
+            onError = onError,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(3f / 4f)
+                .clip(RoundedCornerShape(8.dp)),
+        )
+    } else {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "Camera permission is needed before scanning labels.",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Button(
+                    onClick = { launcher.launch(Manifest.permission.CAMERA) },
+                    shape = RoundedCornerShape(8.dp),
+                ) {
+                    Icon(Icons.Default.CameraAlt, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Allow Camera")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun QrScannerPreview(
+    onQrPayload: (String) -> Unit,
+    onError: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val mainExecutor = remember(context) { ContextCompat.getMainExecutor(context) }
+    val cameraExecutor = remember(lifecycleOwner) { Executors.newSingleThreadExecutor() }
+    val reader = remember {
+        MultiFormatReader().apply {
+            setHints(
+                mapOf(
+                    DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE),
+                    DecodeHintType.TRY_HARDER to true,
+                ),
+            )
+        }
+    }
+    val previewView = remember {
+        PreviewView(context).apply {
+            scaleType = PreviewView.ScaleType.FILL_CENTER
+        }
+    }
+    val cameraProviderState = remember { mutableStateOf<ProcessCameraProvider?>(null) }
+
+    DisposableEffect(lifecycleOwner, reader) {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+        val listener = Runnable {
+            runCatching {
+                val cameraProvider = cameraProviderFuture.get()
+                cameraProviderState.value = cameraProvider
+                val preview = Preview.Builder().build().also {
+                    it.setSurfaceProvider(previewView.surfaceProvider)
+                }
+                val analysis = ImageAnalysis.Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build()
+                    .also { imageAnalysis ->
+                        imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                            val payload = decodeQrPayload(imageProxy, reader)
+                            if (payload != null) {
+                                mainExecutor.execute { onQrPayload(payload) }
+                            }
+                        }
+                    }
+
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    lifecycleOwner,
+                    CameraSelector.DEFAULT_BACK_CAMERA,
+                    preview,
+                    analysis,
+                )
+            }.onFailure { failure ->
+                onError(failure.message ?: "Unable to start QR scanner.")
+            }
+        }
+
+        cameraProviderFuture.addListener(listener, mainExecutor)
+        onDispose {
+            cameraProviderState.value?.unbindAll()
+            cameraExecutor.shutdown()
+        }
+    }
+
+    AndroidView(
+        factory = { previewView },
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun CameraPermissionCapture(
     onPhotoCaptured: (String) -> Unit,
     onError: (String) -> Unit,
@@ -1975,6 +2199,81 @@ private fun CatalogModel.productionYearsLabel(): String? =
 
 private fun com.nils.artifact.data.ArtifactItem.productionYearsLabel(): String? =
     productionYearsLabel(productionYearStart, productionYearEnd)
+
+private fun artifactUidFromQrPayload(payload: String): Long? {
+    val trimmed = payload.trim()
+    if (trimmed.isBlank()) return null
+
+    val jsonUid = runCatching {
+        val value = JSONObject(trimmed).opt("uid")
+        when (value) {
+            is Number -> value.toLong()
+            is String -> value.trim().removePrefix("#").toLongOrNull()
+            else -> null
+        }
+    }.getOrNull()
+    if (jsonUid != null) return jsonUid
+
+    return trimmed
+        .removePrefix("#")
+        .takeIf { value -> value.all { it.isDigit() } }
+        ?.toLongOrNull()
+}
+
+private fun decodeQrPayload(
+    imageProxy: ImageProxy,
+    reader: MultiFormatReader,
+): String? {
+    try {
+        val source = PlanarYUVLuminanceSource(
+            yPlaneBytes(imageProxy),
+            imageProxy.width,
+            imageProxy.height,
+            0,
+            0,
+            imageProxy.width,
+            imageProxy.height,
+            false,
+        )
+        val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+        return runCatching {
+            reader.decodeWithState(binaryBitmap).text
+        }.getOrNull()
+    } finally {
+        reader.reset()
+        imageProxy.close()
+    }
+}
+
+private fun yPlaneBytes(imageProxy: ImageProxy): ByteArray {
+    val plane = imageProxy.planes[0]
+    val width = imageProxy.width
+    val height = imageProxy.height
+    val output = ByteArray(width * height)
+    val buffer = plane.buffer.duplicate()
+    buffer.rewind()
+
+    if (plane.rowStride == width) {
+        buffer.get(output, 0, minOf(output.size, buffer.remaining()))
+        return output
+    }
+
+    val row = ByteArray(plane.rowStride)
+    for (y in 0 until height) {
+        val rowStart = y * plane.rowStride
+        if (rowStart >= buffer.limit()) break
+        buffer.position(rowStart)
+        val length = minOf(plane.rowStride, buffer.remaining())
+        buffer.get(row, 0, length)
+        row.copyInto(
+            destination = output,
+            destinationOffset = y * width,
+            startIndex = 0,
+            endIndex = minOf(width, length),
+        )
+    }
+    return output
+}
 
 private fun formatTimestamp(timestamp: Long): String =
     DateFormat.getDateTimeInstance(
