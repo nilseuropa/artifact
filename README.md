@@ -2,15 +2,40 @@
 
 Artifact is an Android app for cataloging collectible retro-computing items.
 
-The first version is local-first:
+The app is local-first, with optional self-hosted sync:
 
 - browse the collection
 - search by manufacturer, type, serial number, or location
 - manage stored items
 - add an item by taking one or more photos and entering manufacturer, type, serial number, and location
 - store the catalog in a local Room database with photo files kept in the app's private pictures directory
+- export/restore the complete collection as an `.artifactbackup` archive
+- push/pull the same archive format to a self-hosted Artifact server
 
-Server backup is intentionally left as a later repository layer. The current schema uses stable item/photo IDs and timestamps so a future sync adapter can be added without changing the add/browse flow.
+The first server sync path is full collection push/pull. Pulling from the server
+replaces the local collection, photos, collection settings, and UID history with
+the server copy; it does not merge concurrent phone and server edits.
+
+## Server Sync
+
+The companion server lives in `~/github/artifact_server` and uses only Python's
+standard library.
+
+Run it on the machine that should host the collection:
+
+```bash
+cd ~/github/artifact_server
+ARTIFACT_SYNC_TOKEN='choose-a-long-random-token' python3 artifact_server.py --host 0.0.0.0 --port 8080
+```
+
+Then, in the app:
+
+1. Open `Collection Settings`.
+2. Enter the server URL, for example `http://192.168.1.50:8080`.
+3. Enter the same access token.
+4. Tap `Push to Server` to upload the phone collection.
+5. Edit the collection in the server web UI.
+6. Tap `Pull from Server` to synchronize the phone from the server.
 
 ## Catalog Seed
 

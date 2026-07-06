@@ -116,6 +116,7 @@ import com.google.zxing.common.HybridBinarizer
 import com.nils.artifact.data.ArtifactBackupArchive
 import com.nils.artifact.data.ArtifactCategories
 import com.nils.artifact.data.ArtifactItem
+import com.nils.artifact.data.ArtifactSyncSettings
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
 import com.nils.artifact.data.CatalogManufacturer
@@ -191,6 +192,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
     val items by viewModel.items.collectAsState()
     val catalog by viewModel.catalog.collectAsState()
     val collectionSettings by viewModel.collectionSettings.collectAsState()
+    val syncSettings by viewModel.syncSettings.collectAsState()
 
     fun openDetail(returnScreen: Screen, artifact: ArtifactWithPhotos) {
         selectedItemId = artifact.item.id
@@ -294,9 +296,13 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
 
                 Screen.Settings -> CollectionSettingsScreen(
                     settings = collectionSettings,
+                    syncSettings = syncSettings,
                     onSave = viewModel::saveCollectionSettings,
+                    onSaveSyncSettings = viewModel::saveSyncSettings,
                     onExportBackup = viewModel::exportBackup,
                     onRestoreBackup = viewModel::restoreBackup,
+                    onPushToServer = viewModel::pushBackupToServer,
+                    onPullFromServer = viewModel::pullBackupFromServer,
                     onClearCollection = viewModel::clearCollection,
                 )
             }
@@ -547,6 +553,9 @@ private fun ManageScreen(
 private fun CollectionSummaryScreen(items: List<ArtifactWithPhotos>) {
     val valuedItems = items.filter { artifact -> artifact.item.estimatedValue != null }
     val totalValue = valuedItems.sumOf { artifact -> artifact.item.estimatedValue ?: 0.0 }
+    val mostValuableItems = valuedItems
+        .sortedByDescending { artifact -> artifact.item.estimatedValue ?: 0.0 }
+        .take(3)
     val unvaluedCount = items.size - valuedItems.size
     val categorySortOrder = ArtifactCategories.ALL.withIndex()
         .associate { (index, category) -> category to index }
@@ -558,6 +567,17 @@ private fun CollectionSummaryScreen(items: List<ArtifactWithPhotos>) {
             compareBy<Pair<String, Int>> { (category, _) ->
                 categorySortOrder[category] ?: Int.MAX_VALUE
             }.thenBy { (category, _) -> category },
+        )
+    val manufacturerCounts = items
+        .map { artifact -> artifact.item.manufacturer.trim() }
+        .filter { manufacturer -> manufacturer.isNotEmpty() }
+        .groupingBy { manufacturer -> manufacturer }
+        .eachCount()
+        .filter { (_, count) -> count > 1 }
+        .toList()
+        .sortedWith(
+            compareByDescending<Pair<String, Int>> { (_, count) -> count }
+                .thenBy { (manufacturer, _) -> manufacturer },
         )
 
     Column(
@@ -587,12 +607,50 @@ private fun CollectionSummaryScreen(items: List<ArtifactWithPhotos>) {
             value = formatEstimatedValue(totalValue),
             modifier = Modifier.fillMaxWidth(),
         )
+        if (mostValuableItems.isNotEmpty()) {
+            Text(
+                text = "Most valuable items",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                mostValuableItems.forEach { artifact ->
+                    SummaryValueRow(
+                        value = artifact.item.summaryLabel(),
+                        trailing = artifact.item.estimatedValue
+                            ?.let { value -> formatEstimatedValue(value) }
+                            .orEmpty(),
+                    )
+                }
+            }
+        }
         if (unvaluedCount > 0) {
             Text(
                 text = "$unvaluedCount device${if (unvaluedCount == 1) "" else "s"} without estimated value",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+        if (manufacturerCounts.isNotEmpty()) {
+            Text(
+                text = "Items per manufacturer",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                manufacturerCounts.forEach { (manufacturer, count) ->
+                    SummaryCountRow(
+                        label = manufacturer,
+                        count = count,
+                    )
+                }
+            }
         }
         if (categoryCounts.isNotEmpty()) {
             Text(
@@ -605,8 +663,8 @@ private fun CollectionSummaryScreen(items: List<ArtifactWithPhotos>) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 categoryCounts.forEach { (category, count) ->
-                    CategoryCountRow(
-                        category = category,
+                    SummaryCountRow(
+                        label = category,
                         count = count,
                     )
                 }
@@ -616,7 +674,7 @@ private fun CollectionSummaryScreen(items: List<ArtifactWithPhotos>) {
 }
 
 @Composable
-private fun CategoryCountRow(category: String, count: Int) {
+private fun SummaryValueRow(value: String, trailing: String) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
@@ -629,7 +687,37 @@ private fun CategoryCountRow(category: String, count: Int) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = category,
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = trailing,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SummaryCountRow(label: String, count: Int) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = label,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f),
@@ -734,9 +822,13 @@ private fun StatBlock(label: String, value: String, modifier: Modifier = Modifie
 @Composable
 private fun CollectionSettingsScreen(
     settings: CollectionSettings,
+    syncSettings: ArtifactSyncSettings,
     onSave: (CollectionSettings) -> Unit,
+    onSaveSyncSettings: (ArtifactSyncSettings) -> Unit,
     onExportBackup: (Uri, (Result<String>) -> Unit) -> Unit,
     onRestoreBackup: (Uri, (Result<String>) -> Unit) -> Unit,
+    onPushToServer: ((Result<String>) -> Unit) -> Unit,
+    onPullFromServer: ((Result<String>) -> Unit) -> Unit,
     onClearCollection: ((Result<String>) -> Unit) -> Unit,
 ) {
     var collectionName by rememberSaveable(settings.collectionName) {
@@ -754,10 +846,18 @@ private fun CollectionSettingsScreen(
     var ownerNotes by rememberSaveable(settings.ownerNotes) {
         mutableStateOf(settings.ownerNotes)
     }
+    var serverUrl by rememberSaveable(syncSettings.serverUrl) {
+        mutableStateOf(syncSettings.serverUrl)
+    }
+    var accessToken by rememberSaveable(syncSettings.accessToken) {
+        mutableStateOf(syncSettings.accessToken)
+    }
     var savedMessageVisible by remember { mutableStateOf(false) }
+    var syncSettingsSavedVisible by remember { mutableStateOf(false) }
     var backupMessage by remember { mutableStateOf<String?>(null) }
     var collectionOperationInProgress by remember { mutableStateOf(false) }
     var restoreUri by remember { mutableStateOf<Uri?>(null) }
+    var pullFromServerRequested by remember { mutableStateOf(false) }
     var clearCollectionRequested by remember { mutableStateOf(false) }
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/zip"),
@@ -786,6 +886,12 @@ private fun CollectionSettingsScreen(
             ownerPhone = ownerPhone,
             ownerNotes = ownerNotes,
         )
+    fun currentSyncSettings(): ArtifactSyncSettings =
+        ArtifactSyncSettings(
+            serverUrl = serverUrl,
+            accessToken = accessToken,
+        )
+    val syncConfigured = serverUrl.trim().isNotEmpty()
 
     Column(
         modifier = Modifier
@@ -865,6 +971,11 @@ private fun CollectionSettingsScreen(
                 color = MaterialTheme.colorScheme.secondary,
             )
         }
+        Text(
+            text = "Backup",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
         OutlinedButton(
             onClick = {
                 onSave(currentSettings())
@@ -897,6 +1008,89 @@ private fun CollectionSettingsScreen(
             Spacer(modifier = Modifier.width(8.dp))
             Text("Restore Backup")
         }
+        Text(
+            text = "Server Sync",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        OutlinedTextField(
+            value = serverUrl,
+            onValueChange = {
+                serverUrl = it
+                syncSettingsSavedVisible = false
+            },
+            label = { Text("Server URL") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        OutlinedTextField(
+            value = accessToken,
+            onValueChange = {
+                accessToken = it
+                syncSettingsSavedVisible = false
+            },
+            label = { Text("Access token") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Button(
+            onClick = {
+                onSaveSyncSettings(currentSyncSettings())
+                syncSettingsSavedVisible = true
+            },
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.Check, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Save Server Settings")
+        }
+        if (syncSettingsSavedVisible) {
+            Text(
+                text = "Server settings saved",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+        }
+        OutlinedButton(
+            onClick = {
+                onSave(currentSettings())
+                onSaveSyncSettings(currentSyncSettings())
+                savedMessageVisible = false
+                syncSettingsSavedVisible = false
+                collectionOperationInProgress = true
+                backupMessage = "Uploading backup to server..."
+                onPushToServer { result ->
+                    collectionOperationInProgress = false
+                    backupMessage = result.fold(
+                        onSuccess = { message -> message },
+                        onFailure = { error -> error.message ?: "Server upload failed." },
+                    )
+                }
+            },
+            enabled = !collectionOperationInProgress && syncConfigured,
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.FileUpload, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Push to Server")
+        }
+        OutlinedButton(
+            onClick = {
+                onSaveSyncSettings(currentSyncSettings())
+                syncSettingsSavedVisible = false
+                pullFromServerRequested = true
+            },
+            enabled = !collectionOperationInProgress && syncConfigured,
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Default.FileDownload, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Pull from Server")
+        }
         OutlinedButton(
             onClick = { clearCollectionRequested = true },
             enabled = !collectionOperationInProgress,
@@ -915,15 +1109,19 @@ private fun CollectionSettingsScreen(
             Text("Clear Collection")
         }
         backupMessage?.let { message ->
+            val isError = listOf(
+                "failed",
+                "missing",
+                "invalid",
+                "unsupported",
+                "could not",
+                "http ",
+                "error",
+            ).any { marker -> message.contains(marker, ignoreCase = true) }
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (message.contains("failed", ignoreCase = true) ||
-                    message.contains("missing", ignoreCase = true) ||
-                    message.contains("invalid", ignoreCase = true) ||
-                    message.contains("unsupported", ignoreCase = true) ||
-                    message.contains("could not", ignoreCase = true)
-                ) {
+                color = if (isError) {
                     MaterialTheme.colorScheme.error
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -959,6 +1157,39 @@ private fun CollectionSettingsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { restoreUri = null }) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
+
+    if (pullFromServerRequested) {
+        AlertDialog(
+            onDismissRequest = { pullFromServerRequested = false },
+            title = { Text("Pull from Server") },
+            text = {
+                Text("Pulling from the server will replace the current local collection, photos, settings, and UID history with the server copy.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        pullFromServerRequested = false
+                        collectionOperationInProgress = true
+                        backupMessage = "Downloading backup from server..."
+                        onPullFromServer { result ->
+                            collectionOperationInProgress = false
+                            backupMessage = result.fold(
+                                onSuccess = { message -> message },
+                                onFailure = { error -> error.message ?: "Server download failed." },
+                            )
+                        }
+                    },
+                ) {
+                    Text("Pull")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pullFromServerRequested = false }) {
                     Text("Cancel")
                 }
             },
@@ -2893,6 +3124,13 @@ private fun formatEstimatedValueInput(value: Double): String =
     } else {
         value.toString()
     }
+
+private fun ArtifactItem.summaryLabel(): String =
+    listOf(
+        "#$catalogUid",
+        manufacturer.ifBlank { "Unknown manufacturer" },
+        itemType.ifBlank { "Unknown type" },
+    ).joinToString(" ")
 
 private fun defaultBackupFileName(): String {
     val timestamp = SimpleDateFormat("yyyy-MM-dd-HHmm", Locale.US).format(Date())

@@ -8,12 +8,16 @@ import com.nils.artifact.data.ArtifactBackupArchive
 import com.nils.artifact.data.ArtifactDatabase
 import com.nils.artifact.data.ArtifactItem
 import com.nils.artifact.data.ArtifactRepository
+import com.nils.artifact.data.ArtifactSyncClient
+import com.nils.artifact.data.ArtifactSyncSettings
+import com.nils.artifact.data.ArtifactSyncSettingsStore
 import com.nils.artifact.data.ArtifactWithPhotos
 import com.nils.artifact.data.CatalogData
 import com.nils.artifact.data.CatalogSeed
 import com.nils.artifact.data.CollectionSettings
 import com.nils.artifact.data.CollectionSettingsStore
 import java.io.File
+import java.io.InputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,12 +35,16 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
         ArtifactDatabase.get(application).artifactDao(),
     )
     private val settingsStore = CollectionSettingsStore(application)
+    private val syncSettingsStore = ArtifactSyncSettingsStore(application)
 
     private val _catalog = MutableStateFlow(CatalogData.Empty)
     val catalog: StateFlow<CatalogData> = _catalog.asStateFlow()
 
     private val _collectionSettings = MutableStateFlow(settingsStore.load())
     val collectionSettings: StateFlow<CollectionSettings> = _collectionSettings.asStateFlow()
+
+    private val _syncSettings = MutableStateFlow(syncSettingsStore.load())
+    val syncSettings: StateFlow<ArtifactSyncSettings> = _syncSettings.asStateFlow()
 
     val items: StateFlow<List<ArtifactWithPhotos>> = repository.observeItems()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -116,6 +124,17 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun saveSyncSettings(settings: ArtifactSyncSettings) {
+        val cleanedSettings = settings.copy(
+            serverUrl = settings.serverUrl.trim(),
+            accessToken = settings.accessToken.trim(),
+        )
+        _syncSettings.value = cleanedSettings
+        viewModelScope.launch(Dispatchers.IO) {
+            syncSettingsStore.save(cleanedSettings)
+        }
+    }
+
     fun exportBackup(uri: Uri, onComplete: (Result<String>) -> Unit) {
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
@@ -142,42 +161,69 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
                 runCatching {
                     val context = getApplication<Application>()
                     val resolver = context.contentResolver
-                    val archive = resolver.openInputStream(uri)?.use { input ->
-                        ArtifactBackupArchive.read(context, input)
+                    resolver.openInputStream(uri)?.use { input ->
+                        restoreBackupFromStream(input)
                     } ?: error("Could not open backup file.")
+                }
+            }
+            onComplete(result)
+        }
+    }
 
-                    val restoredPhotoDirectory = ArtifactBackupArchive.restoredPhotoDirectory(context)
-                    val restoredPhotoFiles = mutableListOf<File>()
+    fun pushBackupToServer(onComplete: (Result<String>) -> Unit) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    val context = getApplication<Application>()
+                    val snapshot = repository.backupSnapshot()
+                    val tempFile = File.createTempFile(
+                        "artifact-sync-upload-",
+                        ".${ArtifactBackupArchive.FILE_EXTENSION}",
+                        context.cacheDir,
+                    )
                     try {
-                        val restoredPhotos = archive.photos.map { restorePhoto ->
-                            val targetFile = File(
-                                restoredPhotoDirectory,
-                                "${restorePhoto.photo.id}${restorePhoto.extension}",
+                        tempFile.outputStream().use { output ->
+                            ArtifactBackupArchive.write(
+                                outputStream = output,
+                                snapshot = snapshot,
+                                settings = _collectionSettings.value,
                             )
-                            restorePhoto.temporaryFile.copyTo(targetFile, overwrite = true)
-                            restoredPhotoFiles += targetFile
-                            restorePhoto.photo.copy(filePath = targetFile.absolutePath)
                         }
-
-                        val previousPhotoPaths = repository.replaceAllFromBackup(
-                            items = archive.items,
-                            photos = restoredPhotos,
-                            uidAllocations = archive.uidAllocations,
+                        val serverMessage = ArtifactSyncClient.uploadBackup(
+                            settings = _syncSettings.value,
+                            backupFile = tempFile,
                         )
-                        settingsStore.save(archive.settings)
-                        _collectionSettings.value = archive.settings
+                        "Uploaded ${snapshot.items.size} items and ${snapshot.photos.size} photos. $serverMessage"
+                    } finally {
+                        runCatching { tempFile.delete() }
+                    }
+                }
+            }
+            onComplete(result)
+        }
+    }
 
-                        previousPhotoPaths.forEach { path ->
-                            runCatching { File(path).delete() }
+    fun pullBackupFromServer(onComplete: (Result<String>) -> Unit) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    val context = getApplication<Application>()
+                    val tempFile = File.createTempFile(
+                        "artifact-sync-download-",
+                        ".${ArtifactBackupArchive.FILE_EXTENSION}",
+                        context.cacheDir,
+                    )
+                    try {
+                        val serverMessage = ArtifactSyncClient.downloadBackup(
+                            settings = _syncSettings.value,
+                            targetFile = tempFile,
+                        )
+                        val restoreMessage = tempFile.inputStream().use { input ->
+                            restoreBackupFromStream(input)
                         }
-                        archive.temporaryDirectory.deleteRecursively()
-
-                        "Restored ${archive.items.size} items and ${restoredPhotos.size} photos."
-                    } catch (error: Throwable) {
-                        restoredPhotoFiles.forEach { file -> runCatching { file.delete() } }
-                        runCatching { restoredPhotoDirectory.deleteRecursively() }
-                        archive.temporaryDirectory.deleteRecursively()
-                        throw error
+                        "$serverMessage $restoreMessage"
+                    } finally {
+                        runCatching { tempFile.delete() }
                     }
                 }
             }
@@ -197,6 +243,45 @@ class ArtifactViewModel(application: Application) : AndroidViewModel(application
                 }
             }
             onComplete(result)
+        }
+    }
+
+    private suspend fun restoreBackupFromStream(input: InputStream): String {
+        val context = getApplication<Application>()
+        val archive = ArtifactBackupArchive.read(context, input)
+        val restoredPhotoDirectory = ArtifactBackupArchive.restoredPhotoDirectory(context)
+        val restoredPhotoFiles = mutableListOf<File>()
+
+        try {
+            val restoredPhotos = archive.photos.map { restorePhoto ->
+                val targetFile = File(
+                    restoredPhotoDirectory,
+                    "${restorePhoto.photo.id}${restorePhoto.extension}",
+                )
+                restorePhoto.temporaryFile.copyTo(targetFile, overwrite = true)
+                restoredPhotoFiles += targetFile
+                restorePhoto.photo.copy(filePath = targetFile.absolutePath)
+            }
+
+            val previousPhotoPaths = repository.replaceAllFromBackup(
+                items = archive.items,
+                photos = restoredPhotos,
+                uidAllocations = archive.uidAllocations,
+            )
+            settingsStore.save(archive.settings)
+            _collectionSettings.value = archive.settings
+
+            previousPhotoPaths.forEach { path ->
+                runCatching { File(path).delete() }
+            }
+            archive.temporaryDirectory.deleteRecursively()
+
+            return "Restored ${archive.items.size} items and ${restoredPhotos.size} photos."
+        } catch (error: Throwable) {
+            restoredPhotoFiles.forEach { file -> runCatching { file.delete() } }
+            runCatching { restoredPhotoDirectory.deleteRecursively() }
+            archive.temporaryDirectory.deleteRecursively()
+            throw error
         }
     }
 }
