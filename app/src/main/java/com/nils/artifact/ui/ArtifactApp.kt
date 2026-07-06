@@ -184,7 +184,7 @@ private data class EditValueTarget(
 @Composable
 fun ArtifactApp(viewModel: ArtifactViewModel) {
     var screenName by rememberSaveable { mutableStateOf(Screen.Home.name) }
-    var returnScreenName by rememberSaveable { mutableStateOf(Screen.Home.name) }
+    var detailReturnScreenName by rememberSaveable { mutableStateOf(Screen.Home.name) }
     var selectedItemId by rememberSaveable { mutableStateOf<String?>(null) }
     var labelPreviewItem by remember { mutableStateOf<ArtifactItem?>(null) }
     val screen = remember(screenName) { Screen.valueOf(screenName) }
@@ -194,19 +194,25 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
 
     fun openDetail(returnScreen: Screen, artifact: ArtifactWithPhotos) {
         selectedItemId = artifact.item.id
-        returnScreenName = returnScreen.name
+        detailReturnScreenName = returnScreen.name
+        screenName = Screen.Detail.name
+    }
+
+    fun openDetailAfterAdd(item: ArtifactItem) {
+        selectedItemId = item.id
+        detailReturnScreenName = Screen.Browse.name
         screenName = Screen.Detail.name
     }
 
     fun navigateBack() {
-        screenName = if (screen == Screen.Detail) {
-            returnScreenName
+        screenName = if (screenName == Screen.Detail.name) {
+            detailReturnScreenName
         } else {
             Screen.Home.name
         }
     }
 
-    BackHandler(enabled = screen != Screen.Home) {
+    BackHandler(enabled = screenName != Screen.Home.name) {
         navigateBack()
     }
 
@@ -217,7 +223,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                 title = { Text(screen.title()) },
                 navigationIcon = {
                     if (screen != Screen.Home) {
-                        IconButton(onClick = ::navigateBack) {
+                        IconButton(onClick = { navigateBack() }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }
@@ -249,7 +255,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
 
                 Screen.Scan -> QrScanScreen(
                     items = items,
-                    onOpen = { artifact -> openDetail(Screen.Home, artifact) },
+                    onOpen = { artifact -> openDetail(Screen.Scan, artifact) },
                 )
 
                 Screen.Browse -> BrowseScreen(
@@ -275,9 +281,7 @@ fun ArtifactApp(viewModel: ArtifactViewModel) {
                     onDone = { screenName = Screen.Browse.name },
                     onPrintLabel = { item ->
                         labelPreviewItem = item
-                        selectedItemId = item.id
-                        returnScreenName = Screen.Browse.name
-                        screenName = Screen.Detail.name
+                        openDetailAfterAdd(item)
                     },
                 )
 
@@ -365,6 +369,12 @@ private fun HomeScreen(
             onClick = onScan,
         )
         MenuAction(
+            label = "Add New Item",
+            supportingText = "Capture photos and catalog details",
+            icon = { Icon(Icons.Default.Add, contentDescription = null) },
+            onClick = onAdd,
+        )
+        MenuAction(
             label = "Browse",
             supportingText = "Review every cataloged item",
             icon = { Icon(Icons.Default.FolderOpen, contentDescription = null) },
@@ -387,12 +397,6 @@ private fun HomeScreen(
             supportingText = "Device count and total estimated value",
             icon = { Icon(Icons.Default.Inventory2, contentDescription = null) },
             onClick = onSummary,
-        )
-        MenuAction(
-            label = "Add New Item",
-            supportingText = "Capture photos and catalog details",
-            icon = { Icon(Icons.Default.Add, contentDescription = null) },
-            onClick = onAdd,
         )
         MenuAction(
             label = "Collection Settings",
@@ -1009,18 +1013,31 @@ private fun AddItemScreen(
     var category by rememberSaveable { mutableStateOf(ArtifactCategories.DEFAULT) }
     var itemType by rememberSaveable { mutableStateOf("") }
     var serialNumber by rememberSaveable { mutableStateOf("") }
+    var productionYearStart by rememberSaveable { mutableStateOf("") }
+    var productionYearEnd by rememberSaveable { mutableStateOf("") }
+    var productionYearsEdited by rememberSaveable { mutableStateOf(false) }
     var location by rememberSaveable { mutableStateOf("") }
     var estimatedValue by rememberSaveable { mutableStateOf("") }
     var notes by rememberSaveable { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val photoPaths = remember { mutableStateListOf<String>() }
     val parsedEstimatedValue = parseEstimatedValueInput(estimatedValue)
+    val parsedProductionYearStart = parseYearInput(productionYearStart)
+    val parsedProductionYearEnd = parseYearInput(productionYearEnd)
     val hasInvalidEstimatedValue = estimatedValue.isNotBlank() && parsedEstimatedValue == null
+    val hasInvalidProductionYearNumber =
+        (productionYearStart.isNotBlank() && parsedProductionYearStart == null) ||
+            (productionYearEnd.isNotBlank() && parsedProductionYearEnd == null)
+    val hasInvalidProductionYearOrder = parsedProductionYearStart != null &&
+        parsedProductionYearEnd != null &&
+        parsedProductionYearStart > parsedProductionYearEnd
     val canSave = photoPaths.isNotEmpty() &&
         manufacturer.isNotBlank() &&
         itemType.isNotBlank() &&
         location.isNotBlank() &&
-        !hasInvalidEstimatedValue
+        !hasInvalidEstimatedValue &&
+        !hasInvalidProductionYearNumber &&
+        !hasInvalidProductionYearOrder
     val selectedManufacturer = catalog.findManufacturer(manufacturer)
     val selectedModel = catalog.findModel(selectedManufacturer, itemType)
     val manufacturerSuggestions = catalog.manufacturerSuggestions(manufacturer)
@@ -1044,8 +1061,18 @@ private fun AddItemScreen(
             onClick = {
                 manufacturer = suggestion.manufacturer.name
                 itemType = suggestion.model.name
+                productionYearStart = suggestion.model.productionYearStart?.toString().orEmpty()
+                productionYearEnd = suggestion.model.productionYearEnd?.toString().orEmpty()
+                productionYearsEdited = false
             },
         )
+    }
+
+    LaunchedEffect(selectedModel?.id) {
+        if (!productionYearsEdited) {
+            productionYearStart = selectedModel?.productionYearStart?.toString().orEmpty()
+            productionYearEnd = selectedModel?.productionYearEnd?.toString().orEmpty()
+        }
     }
 
     Column(
@@ -1107,6 +1134,46 @@ private fun AddItemScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            OutlinedTextField(
+                value = productionYearStart,
+                onValueChange = {
+                    productionYearStart = it
+                    productionYearsEdited = true
+                },
+                label = { Text("Start year") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f),
+            )
+            OutlinedTextField(
+                value = productionYearEnd,
+                onValueChange = {
+                    productionYearEnd = it
+                    productionYearsEdited = true
+                },
+                label = { Text("End year") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f),
+            )
+        }
+        if (hasInvalidProductionYearNumber) {
+            Text(
+                text = "Production years must be numbers.",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        } else if (hasInvalidProductionYearOrder) {
+            Text(
+                text = "Start year must not be after end year.",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
         OutlinedTextField(
             value = serialNumber,
             onValueChange = { serialNumber = it },
@@ -1151,8 +1218,8 @@ private fun AddItemScreen(
                     manufacturer = manufacturer,
                     modelId = selectedModel?.id,
                     itemType = itemType,
-                    productionYearStart = selectedModel?.productionYearStart,
-                    productionYearEnd = selectedModel?.productionYearEnd,
+                    productionYearStart = parsedProductionYearStart,
+                    productionYearEnd = parsedProductionYearEnd,
                     estimatedValue = parsedEstimatedValue,
                     serialNumber = serialNumber,
                     location = location,
@@ -1177,8 +1244,8 @@ private fun AddItemScreen(
                     manufacturer = manufacturer,
                     modelId = selectedModel?.id,
                     itemType = itemType,
-                    productionYearStart = selectedModel?.productionYearStart,
-                    productionYearEnd = selectedModel?.productionYearEnd,
+                    productionYearStart = parsedProductionYearStart,
+                    productionYearEnd = parsedProductionYearEnd,
                     estimatedValue = parsedEstimatedValue,
                     serialNumber = serialNumber,
                     location = location,
@@ -2810,6 +2877,9 @@ private fun parseEstimatedValueInput(input: String): Double? {
     if (normalized.isBlank()) return null
     return normalized.toDoubleOrNull()?.takeIf { value -> value.isFinite() && value >= 0.0 }
 }
+
+private fun parseYearInput(input: String): Int? =
+    input.trim().takeIf { value -> value.isNotEmpty() }?.toIntOrNull()
 
 private fun formatEstimatedValue(value: Double): String =
     NumberFormat.getNumberInstance(Locale.getDefault()).apply {
